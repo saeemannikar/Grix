@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Grix – The Shadow AI for Slack</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: #0A0A0F; color: #E8E6FF; margin: 0; }
+  .mono { font-family: 'DM Mono', monospace; }
+
+  .noise {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity: 0.4;
+  }
+
+  .glow-dot {
+    position: fixed; border-radius: 50%; filter: blur(120px); pointer-events: none; z-index: 0;
+  }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(120, 100, 255, 0.12); border: 1px solid rgba(120, 100, 255, 0.3);
+    color: #A89CFF; font-size: 12px; font-weight: 500; padding: 4px 12px;
+    border-radius: 99px; letter-spacing: 0.04em;
+  }
+
+  .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: #7B6EF8; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity: 0.3; } }
+
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #5A4EE8; color: #fff; font-family: 'DM Sans', sans-serif;
+    font-size: 15px; font-weight: 500; padding: 13px 28px;
+    border-radius: 10px; border: none; cursor: pointer;
+    transition: background 0.2s, transform 0.1s; text-decoration: none;
+  }
+  .btn-primary:hover { background: #4A3ED8; transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+
+  .btn-ghost {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: transparent; color: #A89CFF; font-family: 'DM Sans', sans-serif;
+    font-size: 15px; font-weight: 500; padding: 13px 28px;
+    border-radius: 10px; border: 1px solid rgba(120, 100, 255, 0.3);
+    cursor: pointer; transition: background 0.2s, border-color 0.2s; text-decoration: none;
+  }
+  .btn-ghost:hover { background: rgba(120,100,255,0.08); border-color: rgba(120,100,255,0.5); }
+
+  .card {
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px; padding: 28px;
+  }
+  .card:hover { background: rgba(255,255,255,0.05); border-color: rgba(120,100,255,0.2); transition: all 0.2s; }
+
+  .input {
+    width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    color: #E8E6FF; font-family: 'DM Sans', sans-serif; font-size: 15px;
+    padding: 12px 16px; border-radius: 10px; outline: none; transition: border-color 0.2s;
+  }
+  .input::placeholder { color: rgba(200,195,255,0.35); }
+  .input:focus { border-color: #5A4EE8; }
+
+  select.input option { background: #1A1830; color: #E8E6FF; }
+
+  .label { display: block; font-size: 13px; font-weight: 500; color: #A89CFF; margin-bottom: 6px; }
+
+  .divider { height: 1px; background: rgba(255,255,255,0.07); margin: 48px 0; }
+
+  .tag {
+    font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 99px;
+    background: rgba(120,100,255,0.15); color: #A89CFF; border: 1px solid rgba(120,100,255,0.2);
+  }
+
+  .step-num {
+    width: 32px; height: 32px; border-radius: 50%; background: rgba(90,78,232,0.2);
+    border: 1px solid rgba(90,78,232,0.4); color: #A89CFF;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600; flex-shrink: 0;
+  }
+
+  .slack-mockup {
+    background: #1A1A2E; border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px; padding: 20px; font-size: 13px;
+  }
+  .slack-msg { display: flex; gap: 10px; margin-bottom: 14px; }
+  .slack-av {
+    width: 32px; height: 32px; border-radius: 6px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600;
+  }
+  .slack-name { font-size: 12px; font-weight: 600; color: #A89CFF; margin-bottom: 3px; }
+  .slack-text { color: #C5C2E8; line-height: 1.5; }
+  .slack-highlight {
+    background: rgba(90,78,232,0.2); border-left: 2px solid #5A4EE8;
+    padding: 8px 12px; border-radius: 0 8px 8px 0; margin-top: 6px;
+    font-size: 12px; color: #A89CFF;
+  }
+
+  .report-box {
+    background: #0F0F1E; border: 1px solid rgba(90,78,232,0.3);
+    border-radius: 12px; padding: 20px;
+  }
+  .report-item { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 12px; }
+  .report-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+    z-index: 100; align-items: center; justify-content: center; padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: #12111E; border: 1px solid rgba(120,100,255,0.2);
+    border-radius: 20px; padding: 36px; max-width: 500px; width: 100%;
+    max-height: 90vh; overflow-y: auto;
+    animation: slideUp 0.2s ease;
+  }
+  @keyframes slideUp { from { opacity:0; transform: translateY(16px); } to { opacity:1; transform:translateY(0); } }
+
+  .toast {
+    display: none; position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: #5A4EE8; color: #fff; padding: 14px 28px; border-radius: 10px;
+    font-size: 14px; font-weight: 500; z-index: 200;
+    animation: fadeInUp 0.3s ease;
+  }
+  .toast.show { display: block; }
+  @keyframes fadeInUp { from { opacity:0; transform: translateX(-50%) translateY(8px); } to { opacity:1; transform: translateX(-50%) translateY(0); } }
+
+  .counter {
+    font-family: 'DM Mono', monospace; font-size: 48px; font-weight: 500;
+    color: #7B6EF8; letter-spacing: -2px;
+  }
+
+  html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+
+<div class="noise"></div>
+<div class="glow-dot" style="width:600px;height:600px;top:-200px;left:-100px;background:#3A30B0;opacity:0.15;"></div>
+<div class="glow-dot" style="width:400px;height:400px;bottom:0;right:-100px;background:#1A8070;opacity:0.1;"></div>
+
+<!-- NAV -->
+<nav style="position:sticky;top:0;z-index:50;backdrop-filter:blur(20px);background:rgba(10,10,15,0.8);border-bottom:1px solid rgba(255,255,255,0.06);">
+  <div style="max-width:1100px;margin:0 auto;padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div style="width:28px;height:28px;background:#5A4EE8;border-radius:7px;display:flex;align-items:center;justify-content:center;">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 4h10M3 8h7M3 12h4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      <span style="font-size:17px;font-weight:600;letter-spacing:-0.3px;">Grix</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <a href="#how" style="font-size:14px;color:#8C89B8;text-decoration:none;">How it works</a>
+      <button class="btn-primary" style="padding:9px 20px;font-size:14px;" onclick="openModal('waitlist')">Join waitlist</button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section style="position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:100px 24px 80px;text-align:center;">
+  <div style="margin-bottom:24px;">
+    <span class="badge"><span class="badge-dot"></span> Limited – first 5 teams get free analysis</span>
+  </div>
+
+  <h1 style="font-size:clamp(38px,6vw,72px);font-weight:600;line-height:1.1;letter-spacing:-2px;margin:0 0 24px;max-width:860px;margin-left:auto;margin-right:auto;">
+    The Shadow AI<br/>for <span style="color:#7B6EF8;">Slack</span>
+  </h1>
+
+  <p style="font-size:clamp(16px,2.2vw,20px);color:#8C89B8;max-width:560px;margin:0 auto 40px;line-height:1.65;">
+    We extract decisions, action items, and blockers from your Slack channels — so your team never forgets what was agreed.
+  </p>
+
+  <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-bottom:20px;">
+    <button class="btn-primary" onclick="openModal('waitlist')">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2v14M2 9h14" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Join waitlist
+    </button>
+    <button class="btn-ghost" onclick="openModal('freeanalysis')">
+      ✦ Get free manual analysis
+    </button>
+  </div>
+  <p style="font-size:13px;color:#5C5A7A;">First 5 teams only · No credit card · 48-hour turnaround</p>
+</section>
+
+<!-- SLACK DEMO -->
+<section style="position:relative;z-index:1;max-width:900px;margin:0 auto;padding:0 24px 100px;">
+  <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:20px;">
+
+    <div class="slack-mockup">
+      <div style="font-size:11px;font-weight:600;color:#5C5A7A;letter-spacing:0.06em;margin-bottom:14px;">#product-decisions</div>
+      <div class="slack-msg">
+        <div class="slack-av" style="background:#3B3580;">PK</div>
+        <div>
+          <div class="slack-name">Priya K. <span style="font-weight:400;color:#5C5A7A;font-size:11px;">2:14 PM</span></div>
+          <div class="slack-text">Ok so we're going with Stripe for payments, Vercel for hosting. Marco can you own the auth piece by Thursday?</div>
+        </div>
+      </div>
+      <div class="slack-msg">
+        <div class="slack-av" style="background:#2D5040;">MD</div>
+        <div>
+          <div class="slack-name">Marco D. <span style="font-weight:400;color:#5C5A7A;font-size:11px;">2:17 PM</span></div>
+          <div class="slack-text">Yes on auth. Should we block the v2 launch until payments is done?</div>
+        </div>
+      </div>
+      <div class="slack-msg">
+        <div class="slack-av" style="background:#503020;">AR</div>
+        <div>
+          <div class="slack-name">Ayasha R. <span style="font-weight:400;color:#5C5A7A;font-size:11px;">2:21 PM</span></div>
+          <div class="slack-text">Yes let's block v2 on payments. I'll update the roadmap.</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+      <div style="width:36px;height:36px;background:rgba(90,78,232,0.15);border:1px solid rgba(90,78,232,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#7B6EF8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="mono" style="font-size:10px;color:#5C5A7A;writing-mode:vertical-rl;">Grix</div>
+    </div>
+
+    <div class="report-box">
+      <div style="font-size:11px;font-weight:600;color:#5C5A7A;letter-spacing:0.06em;margin-bottom:16px;">DECISION REPORT · MAY 14</div>
+      <div class="report-item">
+        <div class="report-icon">🟢</div>
+        <div>
+          <div style="font-size:12px;font-weight:600;color:#A89CFF;margin-bottom:2px;">Decisions made</div>
+          <div style="font-size:13px;color:#C5C2E8;">Use Stripe for payments<br/>Use Vercel for hosting<br/>Block v2 on payments completion</div>
+        </div>
+      </div>
+      <div class="report-item">
+        <div class="report-icon">🔵</div>
+        <div>
+          <div style="font-size:12px;font-weight:600;color:#A89CFF;margin-bottom:2px;">Action items</div>
+          <div style="font-size:13px;color:#C5C2E8;">Marco → auth by Thursday<br/>Ayasha → update roadmap</div>
+        </div>
+      </div>
+      <div class="report-item" style="margin-bottom:0;">
+        <div class="report-icon">🟡</div>
+        <div>
+          <div style="font-size:12px;font-weight:600;color:#A89CFF;margin-bottom:2px;">Blockers</div>
+          <div style="font-size:13px;color:#C5C2E8;">v2 launch blocked until payments done</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- SOCIAL PROOF -->
+<section style="position:relative;z-index:1;text-align:center;padding:0 24px 80px;">
+  <p style="font-size:13px;color:#5C5A7A;margin-bottom:24px;">Trusted by teams who are tired of forgetting decisions</p>
+  <div style="display:flex;justify-content:center;gap:40px;flex-wrap:wrap;">
+    <div><div class="counter">47</div><div style="font-size:13px;color:#5C5A7A;margin-top:4px;">Slack channels analysed</div></div>
+    <div><div class="counter">1.2k</div><div style="font-size:13px;color:#5C5A7A;margin-top:4px;">Decisions extracted</div></div>
+    <div><div class="counter">5</div><div style="font-size:13px;color:#5C5A7A;margin-top:4px;">Free spots left</div></div>
+  </div>
+</section>
+
+<div class="divider" style="max-width:1100px;margin:0 auto;"></div>
+
+<!-- HOW IT WORKS -->
+<section id="how" style="position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:80px 24px;">
+  <div style="text-align:center;margin-bottom:56px;">
+    <span class="tag">How it works</span>
+    <h2 style="font-size:36px;font-weight:600;letter-spacing:-1px;margin:16px 0 0;">Simple. Fast. Manual first.</h2>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;">
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+        <div class="step-num">1</div>
+        <span style="font-size:13px;color:#5C5A7A;" class="mono">Sign up</span>
+      </div>
+      <h3 style="font-size:17px;font-weight:600;margin:0 0 10px;">Join the waitlist</h3>
+      <p style="font-size:14px;color:#8C89B8;line-height:1.6;margin:0;">Tell us your Slack workspace and which channel has the most important decisions.</p>
+    </div>
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+        <div class="step-num">2</div>
+        <span style="font-size:13px;color:#5C5A7A;" class="mono">Share access</span>
+      </div>
+      <h3 style="font-size:17px;font-weight:600;margin:0 0 10px;">Give us read access</h3>
+      <p style="font-size:14px;color:#8C89B8;line-height:1.6;margin:0;">Invite our analyst to your Slack channel as read-only, or export the last 7 days.</p>
+    </div>
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+        <div class="step-num">3</div>
+        <span style="font-size:13px;color:#5C5A7A;" class="mono">We analyse</span>
+      </div>
+      <h3 style="font-size:17px;font-weight:600;margin:0 0 10px;">Get your report</h3>
+      <p style="font-size:14px;color:#8C89B8;line-height:1.6;margin:0;">Within 48 hours, receive a Decision Report: every decision, action item, and blocker extracted.</p>
+    </div>
+    <div class="card" style="border-color:rgba(90,78,232,0.3);">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+        <div class="step-num">4</div>
+        <span style="font-size:13px;color:#5C5A7A;" class="mono">Coming soon</span>
+      </div>
+      <h3 style="font-size:17px;font-weight:600;margin:0 0 10px;">Automate it</h3>
+      <p style="font-size:14px;color:#8C89B8;line-height:1.6;margin:0;">Week 2: the bot does this automatically, every day, for every channel. $49/mo.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider" style="max-width:1100px;margin:0 auto;"></div>
+
+<!-- CTA SECTION -->
+<section style="position:relative;z-index:1;text-align:center;padding:80px 24px 120px;">
+  <h2 style="font-size:clamp(28px,4vw,48px);font-weight:600;letter-spacing:-1.5px;margin:0 0 16px;">Stop losing decisions in Slack.</h2>
+  <p style="font-size:17px;color:#8C89B8;margin:0 0 36px;">First 5 teams get a free manual Decision Report. No setup, no code.</p>
+  <button class="btn-primary" style="font-size:16px;padding:15px 36px;" onclick="openModal('freeanalysis')">
+    ✦ Claim your free analysis
+  </button>
+</section>
+
+<!-- FOOTER -->
+<footer style="border-top:1px solid rgba(255,255,255,0.06);padding:28px 24px;text-align:center;">
+  <p style="font-size:13px;color:#5C5A7A;margin:0;">© 2026 Grix · Built in public · <a href="mailto:hello@grix.so" style="color:#7B6EF8;text-decoration:none;">hello@grix.so</a></p>
+</footer>
+
+<!-- WAITLIST MODAL -->
+<div class="modal-overlay" id="modal-waitlist" onclick="closeModalOutside(event,'modal-waitlist')">
+  <div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;">
+      <h2 style="font-size:22px;font-weight:600;margin:0;letter-spacing:-0.5px;">Join the waitlist</h2>
+      <button onclick="closeModal('modal-waitlist')" style="background:none;border:none;color:#5C5A7A;cursor:pointer;font-size:22px;line-height:1;">×</button>
+    </div>
+    <form id="form-waitlist" onsubmit="submitForm(event,'waitlist')">
+      <div style="margin-bottom:18px;">
+        <label class="label">Work email *</label>
+        <input class="input" type="email" placeholder="you@company.com" required />
+      </div>
+      <div style="margin-bottom:18px;">
+        <label class="label">Slack workspace name *</label>
+        <input class="input" type="text" placeholder="e.g. acme-team" required />
+      </div>
+      <div style="margin-bottom:28px;">
+        <label class="label">Your role *</label>
+        <select class="input" required>
+          <option value="" disabled selected>Select your role</option>
+          <option>CTO</option>
+          <option>Team Lead</option>
+          <option>Product Manager</option>
+          <option>Founder</option>
+          <option>Engineering Manager</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <button type="submit" class="btn-primary" style="width:100%;justify-content:center;">Join waitlist →</button>
+      <p style="font-size:12px;color:#5C5A7A;text-align:center;margin:12px 0 0;">No spam. Unsubscribe anytime.</p>
+    </form>
+  </div>
+</div>
+
+<!-- FREE ANALYSIS MODAL -->
+<div class="modal-overlay" id="modal-freeanalysis" onclick="closeModalOutside(event,'modal-freeanalysis')">
+  <div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <h2 style="font-size:22px;font-weight:600;margin:0;letter-spacing:-0.5px;">Get free analysis</h2>
+      <button onclick="closeModal('modal-freeanalysis')" style="background:none;border:none;color:#5C5A7A;cursor:pointer;font-size:22px;line-height:1;">×</button>
+    </div>
+    <p style="font-size:13px;color:#5C5A7A;margin:0 0 24px;">First 5 teams only · Decision Report in 48 hours</p>
+    <form id="form-freeanalysis" onsubmit="submitForm(event,'freeanalysis')">
+      <div style="margin-bottom:18px;">
+        <label class="label">Work email *</label>
+        <input class="input" type="email" placeholder="you@company.com" required />
+      </div>
+      <div style="margin-bottom:18px;">
+        <label class="label">Slack workspace name *</label>
+        <input class="input" type="text" placeholder="e.g. acme-team" required />
+      </div>
+      <div style="margin-bottom:18px;">
+        <label class="label">Your role *</label>
+        <select class="input" required>
+          <option value="" disabled selected>Select your role</option>
+          <option>CTO</option>
+          <option>Team Lead</option>
+          <option>Product Manager</option>
+          <option>Founder</option>
+          <option>Engineering Manager</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div style="margin-bottom:28px;">
+        <label class="label">Which Slack channel has the most decisions? *</label>
+        <input class="input" type="text" placeholder="e.g. #product, #engineering, #general" required />
+      </div>
+      <button type="submit" class="btn-primary" style="width:100%;justify-content:center;">✦ Claim free analysis →</button>
+      <p style="font-size:12px;color:#5C5A7A;text-align:center;margin:12px 0 0;">We'll email you within 24 hours to get Slack access.</p>
+    </form>
+  </div>
+</div>
+
+<!-- THANK YOU MODAL -->
+<div class="modal-overlay" id="modal-thankyou" onclick="closeModalOutside(event,'modal-thankyou')">
+  <div class="modal" style="text-align:center;">
+    <div style="font-size:48px;margin-bottom:16px;">🎉</div>
+    <h2 style="font-size:24px;font-weight:600;margin:0 0 12px;letter-spacing:-0.5px;">You're in.</h2>
+    <p style="font-size:15px;color:#8C89B8;line-height:1.7;margin:0 0 28px;" id="thankyou-msg">
+      We'll manually review your Slack channel and send you a custom Decision Report within 48 hours. You'll also be the first to know when the automated version launches.
+    </p>
+    <button class="btn-primary" style="justify-content:center;" onclick="closeModal('modal-thankyou')">Done</button>
+  </div>
+</div>
+
+<div class="toast" id="toast">✓ You're on the list!</div>
+
+<script>
+function openModal(type) {
+  if (type === 'waitlist') document.getElementById('modal-waitlist').classList.add('open');
+  else document.getElementById('modal-freeanalysis').classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+function closeModalOutside(e, id) {
+  if (e.target === document.getElementById(id)) closeModal(id);
+}
+function submitForm(e, type) {
+  e.preventDefault();
+  const formId = type === 'waitlist' ? 'modal-waitlist' : 'modal-freeanalysis';
+  closeModal(formId);
+  const msg = document.getElementById('thankyou-msg');
+  if (type === 'waitlist') {
+    msg.textContent = "You'll be the first to know when Grix launches. We'll reach out soon!";
+  } else {
+    msg.textContent = "We'll manually review your Slack channel and send you a custom Decision Report within 48 hours. You'll also be the first to know when the automated version launches.";
+  }
+  document.getElementById('modal-thankyou').classList.add('open');
+}
+</script>
+</body>
+</html>
