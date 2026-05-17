@@ -10,27 +10,27 @@
   *, *::before, *::after { box-sizing: border-box; }
   body { font-family: 'DM Sans', sans-serif; background: #0A0A0F; color: #E8E6FF; margin: 0; }
   .mono { font-family: 'DM Mono', monospace; }
-
+ 
   .noise {
     position: fixed; inset: 0; pointer-events: none; z-index: 0;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
     opacity: 0.4;
   }
-
+ 
   .glow-dot {
     position: fixed; border-radius: 50%; filter: blur(120px); pointer-events: none; z-index: 0;
   }
-
+ 
   .badge {
     display: inline-flex; align-items: center; gap: 6px;
     background: rgba(120, 100, 255, 0.12); border: 1px solid rgba(120, 100, 255, 0.3);
     color: #A89CFF; font-size: 12px; font-weight: 500; padding: 4px 12px;
     border-radius: 99px; letter-spacing: 0.04em;
   }
-
+ 
   .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: #7B6EF8; animation: pulse 2s infinite; }
   @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity: 0.3; } }
-
+ 
   .btn-primary {
     display: inline-flex; align-items: center; gap: 8px;
     background: #5A4EE8; color: #fff; font-family: 'DM Sans', sans-serif;
@@ -40,7 +40,7 @@
   }
   .btn-primary:hover { background: #4A3ED8; transform: translateY(-1px); }
   .btn-primary:active { transform: translateY(0); }
-
+ 
   .btn-ghost {
     display: inline-flex; align-items: center; gap: 8px;
     background: transparent; color: #A89CFF; font-family: 'DM Sans', sans-serif;
@@ -49,13 +49,13 @@
     cursor: pointer; transition: background 0.2s, border-color 0.2s; text-decoration: none;
   }
   .btn-ghost:hover { background: rgba(120,100,255,0.08); border-color: rgba(120,100,255,0.5); }
-
+ 
   .card {
     background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
     border-radius: 16px; padding: 28px;
   }
   .card:hover { background: rgba(255,255,255,0.05); border-color: rgba(120,100,255,0.2); transition: all 0.2s; }
-
+ 
   .input {
     width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
     color: #E8E6FF; font-family: 'DM Sans', sans-serif; font-size: 15px;
@@ -63,25 +63,25 @@
   }
   .input::placeholder { color: rgba(200,195,255,0.35); }
   .input:focus { border-color: #5A4EE8; }
-
+ 
   select.input option { background: #1A1830; color: #E8E6FF; }
-
+ 
   .label { display: block; font-size: 13px; font-weight: 500; color: #A89CFF; margin-bottom: 6px; }
-
+ 
   .divider { height: 1px; background: rgba(255,255,255,0.07); margin: 48px 0; }
-
+ 
   .tag {
     font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 99px;
     background: rgba(120,100,255,0.15); color: #A89CFF; border: 1px solid rgba(120,100,255,0.2);
   }
-
+ 
   .step-num {
     width: 32px; height: 32px; border-radius: 50%; background: rgba(90,78,232,0.2);
     border: 1px solid rgba(90,78,232,0.4); color: #A89CFF;
     display: flex; align-items: center; justify-content: center;
     font-size: 13px; font-weight: 600; flex-shrink: 0;
   }
-
+ 
   .slack-mockup {
     background: #1A1A2E; border: 1px solid rgba(255,255,255,0.08);
     border-radius: 12px; padding: 20px; font-size: 13px;
@@ -98,14 +98,14 @@
     padding: 8px 12px; border-radius: 0 8px 8px 0; margin-top: 6px;
     font-size: 12px; color: #A89CFF;
   }
-
+ 
   .report-box {
     background: #0F0F1E; border: 1px solid rgba(90,78,232,0.3);
     border-radius: 12px; padding: 20px;
   }
   .report-item { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 12px; }
   .report-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
-
+ 
   .modal-overlay {
     display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8);
     z-index: 100; align-items: center; justify-content: center; padding: 20px;
@@ -118,7 +118,7 @@
     animation: slideUp 0.2s ease;
   }
   @keyframes slideUp { from { opacity:0; transform: translateY(16px); } to { opacity:1; transform:translateY(0); } }
-
+ 
   .toast {
     display: none; position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
     background: #5A4EE8; color: #fff; padding: 14px 28px; border-radius: 10px;
@@ -127,21 +127,21 @@
   }
   .toast.show { display: block; }
   @keyframes fadeInUp { from { opacity:0; transform: translateX(-50%) translateY(8px); } to { opacity:1; transform: translateX(-50%) translateY(0); } }
-
+ 
   .counter {
     font-family: 'DM Mono', monospace; font-size: 48px; font-weight: 500;
     color: #7B6EF8; letter-spacing: -2px;
   }
-
+ 
   html { scroll-behavior: smooth; }
 </style>
 </head>
 <body>
-
+ 
 <div class="noise"></div>
 <div class="glow-dot" style="width:600px;height:600px;top:-200px;left:-100px;background:#3A30B0;opacity:0.15;"></div>
 <div class="glow-dot" style="width:400px;height:400px;bottom:0;right:-100px;background:#1A8070;opacity:0.1;"></div>
-
+ 
 <!-- NAV -->
 <nav style="position:sticky;top:0;z-index:50;backdrop-filter:blur(20px);background:rgba(10,10,15,0.8);border-bottom:1px solid rgba(255,255,255,0.06);">
   <div style="max-width:1100px;margin:0 auto;padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;">
@@ -157,21 +157,21 @@
     </div>
   </div>
 </nav>
-
+ 
 <!-- HERO -->
 <section style="position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:100px 24px 80px;text-align:center;">
   <div style="margin-bottom:24px;">
     <span class="badge"><span class="badge-dot"></span> Limited – first 5 teams get free analysis</span>
   </div>
-
+ 
   <h1 style="font-size:clamp(38px,6vw,72px);font-weight:600;line-height:1.1;letter-spacing:-2px;margin:0 0 24px;max-width:860px;margin-left:auto;margin-right:auto;">
     The Shadow AI<br/>for <span style="color:#7B6EF8;">Slack</span>
   </h1>
-
+ 
   <p style="font-size:clamp(16px,2.2vw,20px);color:#8C89B8;max-width:560px;margin:0 auto 40px;line-height:1.65;">
     We extract decisions, action items, and blockers from your Slack channels — so your team never forgets what was agreed.
   </p>
-
+ 
   <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-bottom:20px;">
     <button class="btn-primary" onclick="openModal('waitlist')">
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2v14M2 9h14" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -183,11 +183,11 @@
   </div>
   <p style="font-size:13px;color:#5C5A7A;">First 5 teams only · No credit card · 48-hour turnaround</p>
 </section>
-
+ 
 <!-- SLACK DEMO -->
 <section style="position:relative;z-index:1;max-width:900px;margin:0 auto;padding:0 24px 100px;">
   <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:20px;">
-
+ 
     <div class="slack-mockup">
       <div style="font-size:11px;font-weight:600;color:#5C5A7A;letter-spacing:0.06em;margin-bottom:14px;">#product-decisions</div>
       <div class="slack-msg">
@@ -212,14 +212,14 @@
         </div>
       </div>
     </div>
-
+ 
     <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
       <div style="width:36px;height:36px;background:rgba(90,78,232,0.15);border:1px solid rgba(90,78,232,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#7B6EF8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
       <div class="mono" style="font-size:10px;color:#5C5A7A;writing-mode:vertical-rl;">Grix</div>
     </div>
-
+ 
     <div class="report-box">
       <div style="font-size:11px;font-weight:600;color:#5C5A7A;letter-spacing:0.06em;margin-bottom:16px;">DECISION REPORT · MAY 14</div>
       <div class="report-item">
@@ -244,10 +244,10 @@
         </div>
       </div>
     </div>
-
+ 
   </div>
 </section>
-
+ 
 <!-- SOCIAL PROOF -->
 <section style="position:relative;z-index:1;text-align:center;padding:0 24px 80px;">
   <p style="font-size:13px;color:#5C5A7A;margin-bottom:24px;">Trusted by teams who are tired of forgetting decisions</p>
@@ -257,9 +257,9 @@
     <div><div class="counter">5</div><div style="font-size:13px;color:#5C5A7A;margin-top:4px;">Free spots left</div></div>
   </div>
 </section>
-
+ 
 <div class="divider" style="max-width:1100px;margin:0 auto;"></div>
-
+ 
 <!-- HOW IT WORKS -->
 <section id="how" style="position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:80px 24px;">
   <div style="text-align:center;margin-bottom:56px;">
@@ -301,9 +301,9 @@
     </div>
   </div>
 </section>
-
+ 
 <div class="divider" style="max-width:1100px;margin:0 auto;"></div>
-
+ 
 <!-- CTA SECTION -->
 <section style="position:relative;z-index:1;text-align:center;padding:80px 24px 120px;">
   <h2 style="font-size:clamp(28px,4vw,48px);font-weight:600;letter-spacing:-1.5px;margin:0 0 16px;">Stop losing decisions in Slack.</h2>
@@ -312,12 +312,12 @@
     ✦ Claim your free analysis
   </button>
 </section>
-
+ 
 <!-- FOOTER -->
 <footer style="border-top:1px solid rgba(255,255,255,0.06);padding:28px 24px;text-align:center;">
   <p style="font-size:13px;color:#5C5A7A;margin:0;">© 2026 Grix · Built in public · <a href="mailto:hello@grix.so" style="color:#7B6EF8;text-decoration:none;">hello@grix.so</a></p>
 </footer>
-
+ 
 <!-- WAITLIST MODAL -->
 <div class="modal-overlay" id="modal-waitlist" onclick="closeModalOutside(event,'modal-waitlist')">
   <div class="modal">
@@ -326,17 +326,19 @@
       <button onclick="closeModal('modal-waitlist')" style="background:none;border:none;color:#5C5A7A;cursor:pointer;font-size:22px;line-height:1;">×</button>
     </div>
     <form id="form-waitlist" onsubmit="submitForm(event,'waitlist')">
+      <input type="hidden" name="_subject" value="New Grix Waitlist Signup" />
+      <input type="hidden" name="form_type" value="waitlist" />
       <div style="margin-bottom:18px;">
         <label class="label">Work email *</label>
-        <input class="input" type="email" placeholder="you@company.com" required />
+        <input class="input" type="email" name="email" placeholder="you@company.com" required />
       </div>
       <div style="margin-bottom:18px;">
         <label class="label">Slack workspace name *</label>
-        <input class="input" type="text" placeholder="e.g. acme-team" required />
+        <input class="input" type="text" name="workspace" placeholder="e.g. acme-team" required />
       </div>
       <div style="margin-bottom:28px;">
         <label class="label">Your role *</label>
-        <select class="input" required>
+        <select class="input" name="role" required>
           <option value="" disabled selected>Select your role</option>
           <option>CTO</option>
           <option>Team Lead</option>
@@ -351,7 +353,7 @@
     </form>
   </div>
 </div>
-
+ 
 <!-- FREE ANALYSIS MODAL -->
 <div class="modal-overlay" id="modal-freeanalysis" onclick="closeModalOutside(event,'modal-freeanalysis')">
   <div class="modal">
@@ -361,17 +363,19 @@
     </div>
     <p style="font-size:13px;color:#5C5A7A;margin:0 0 24px;">First 5 teams only · Decision Report in 48 hours</p>
     <form id="form-freeanalysis" onsubmit="submitForm(event,'freeanalysis')">
+      <input type="hidden" name="_subject" value="New Grix Free Analysis Request" />
+      <input type="hidden" name="form_type" value="free_analysis" />
       <div style="margin-bottom:18px;">
         <label class="label">Work email *</label>
-        <input class="input" type="email" placeholder="you@company.com" required />
+        <input class="input" type="email" name="email" placeholder="you@company.com" required />
       </div>
       <div style="margin-bottom:18px;">
         <label class="label">Slack workspace name *</label>
-        <input class="input" type="text" placeholder="e.g. acme-team" required />
+        <input class="input" type="text" name="workspace" placeholder="e.g. acme-team" required />
       </div>
       <div style="margin-bottom:18px;">
         <label class="label">Your role *</label>
-        <select class="input" required>
+        <select class="input" name="role" required>
           <option value="" disabled selected>Select your role</option>
           <option>CTO</option>
           <option>Team Lead</option>
@@ -383,14 +387,14 @@
       </div>
       <div style="margin-bottom:28px;">
         <label class="label">Which Slack channel has the most decisions? *</label>
-        <input class="input" type="text" placeholder="e.g. #product, #engineering, #general" required />
+        <input class="input" type="text" name="slack_channel" placeholder="e.g. #product, #engineering, #general" required />
       </div>
       <button type="submit" class="btn-primary" style="width:100%;justify-content:center;">✦ Claim free analysis →</button>
       <p style="font-size:12px;color:#5C5A7A;text-align:center;margin:12px 0 0;">We'll email you within 24 hours to get Slack access.</p>
     </form>
   </div>
 </div>
-
+ 
 <!-- THANK YOU MODAL -->
 <div class="modal-overlay" id="modal-thankyou" onclick="closeModalOutside(event,'modal-thankyou')">
   <div class="modal" style="text-align:center;">
@@ -402,10 +406,13 @@
     <button class="btn-primary" style="justify-content:center;" onclick="closeModal('modal-thankyou')">Done</button>
   </div>
 </div>
-
+ 
 <div class="toast" id="toast">✓ You're on the list!</div>
-
+ 
 <script>
+const FORMSPREE_WAITLIST = 'https://formspree.io/f/mkoewpza';
+const FORMSPREE_ANALYSIS = 'https://formspree.io/f/xojbaply';
+ 
 function openModal(type) {
   if (type === 'waitlist') document.getElementById('modal-waitlist').classList.add('open');
   else document.getElementById('modal-freeanalysis').classList.add('open');
@@ -416,18 +423,45 @@ function closeModal(id) {
 function closeModalOutside(e, id) {
   if (e.target === document.getElementById(id)) closeModal(id);
 }
-function submitForm(e, type) {
+ 
+async function submitForm(e, type) {
   e.preventDefault();
+  const form = e.target;
+  const btn = form.querySelector('button[type="submit"]');
+  const endpoint = type === 'waitlist' ? FORMSPREE_WAITLIST : FORMSPREE_ANALYSIS;
   const formId = type === 'waitlist' ? 'modal-waitlist' : 'modal-freeanalysis';
-  closeModal(formId);
-  const msg = document.getElementById('thankyou-msg');
-  if (type === 'waitlist') {
-    msg.textContent = "You'll be the first to know when Grix launches. We'll reach out soon!";
-  } else {
-    msg.textContent = "We'll manually review your Slack channel and send you a custom Decision Report within 48 hours. You'll also be the first to know when the automated version launches.";
+ 
+  btn.textContent = 'Sending…';
+  btn.disabled = true;
+ 
+  try {
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      body: new FormData(form),
+      headers: { 'Accept': 'application/json' }
+    });
+ 
+    if (res.ok) {
+      closeModal(formId);
+      const msg = document.getElementById('thankyou-msg');
+      if (type === 'waitlist') {
+        msg.textContent = "You'll be the first to know when Grix launches. We'll reach out soon!";
+      } else {
+        msg.textContent = "We'll manually review your Slack channel and send you a custom Decision Report within 48 hours. You'll also be the first to know when the automated version launches.";
+      }
+      document.getElementById('modal-thankyou').classList.add('open');
+      form.reset();
+    } else {
+      alert('Something went wrong. Please try again or email hello@grix.so');
+    }
+  } catch {
+    alert('Network error. Please try again.');
   }
-  document.getElementById('modal-thankyou').classList.add('open');
+ 
+  btn.textContent = type === 'waitlist' ? 'Join waitlist →' : '✦ Claim free analysis →';
+  btn.disabled = false;
 }
 </script>
 </body>
 </html>
+ 
