@@ -1,11 +1,5 @@
 {
   "rewrites": [
     { "source": "/dashboard", "destination": "/dashboard.html" }
-  ],
-  "functions": {
-    "api/extractions.js": {
-      "memory": 128,
-      "maxDuration": 10
-    }
-  }
+  ]
 }
