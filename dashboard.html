@@ -524,7 +524,7 @@
     tbody.innerHTML = '<tr class="loading-row"><td colspan="7">Loading...</td></tr>';
 
     try {
-      const res = await fetch(`/api/extractions?type=${currentType}&days=${currentDays}&limit=100`);
+       const res = await fetch(`/api/extraction?type=${currentType}&days=${currentDays}&limit=100`);
       const data = await res.json();
 
       // Stats
