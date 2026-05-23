@@ -1,16 +1,18 @@
-export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+export const config = { runtime: 'edge' };
 
-  if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+export default async function handler(req) {
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Content-Type': 'application/json',
+  };
 
-  console.log('API KEY present:', !!process.env.NVIDIA_API_KEY);
-  console.log('Body:', JSON.stringify(req.body));
+  if (req.method === 'OPTIONS') return new Response(null, { status: 200, headers });
+  if (req.method !== 'POST') return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers });
 
-  const { message } = req.body;
-  if (!message?.trim()) return res.status(400).json({ error: 'No message provided' });
+  const { message } = await req.json();
+  if (!message?.trim()) return new Response(JSON.stringify({ error: 'No message' }), { status: 400, headers });
 
   const prompt = `You are an extraction engine for a team communication tool.
 
@@ -33,7 +35,7 @@ Rules:
 - "blocker": something is blocked, waiting, or stuck
 - "approval": something needs sign-off or was approved
 - "decision_change": a previous decision is being reversed or contradicted
-- null: casual chat, greetings, or questions with no actionable content`;
+- null: casual chat, greetings, or no actionable content`;
 
   try {
     const response = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
@@ -43,26 +45,21 @@ Rules:
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'mistralai/mistral-small-4-119b-2603',
+        model: 'meta/llama-3.1-8b-instruct',
         messages: [{ role: 'user', content: prompt }],
         temperature: 0,
-        max_tokens: 150,
+        max_tokens: 120,
       }),
     });
 
-    console.log('NVIDIA status:', response.status);
     const data = await response.json();
-    console.log('NVIDIA response:', JSON.stringify(data));
-
-    const raw = data.choices?.[0]?.message?.content?.trim();
-    if (!raw) return res.status(500).json({ error: 'Empty response from model' });
+    const raw  = data.choices?.[0]?.message?.content?.trim();
+    if (!raw) return new Response(JSON.stringify({ error: 'Empty response' }), { status: 500, headers });
 
     const clean  = raw.replace(/```json|```/g, '').trim();
     const parsed = JSON.parse(clean);
-
-    return res.status(200).json(parsed);
+    return new Response(JSON.stringify(parsed), { status: 200, headers });
   } catch (err) {
-    console.error('[api/demo]', err.message);
-    return res.status(500).json({ error: err.message });
+    return new Response(JSON.stringify({ error: err.message }), { status: 500, headers });
   }
 }
