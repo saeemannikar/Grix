@@ -588,6 +588,21 @@ function demoRenderDigest() {
   }
   if (empty) empty.style.display = 'none';
 
+  // Show loading items
+  const loading = demoExtracted.filter(e => e.type === '__loading');
+  if (loading.length) {
+    const sec = document.createElement('div');
+    sec.className = 'demo-section-block';
+    loading.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'demo-item';
+      div.style.cssText = 'border-left:2px solid #5C5A7A;background:rgba(255,255,255,0.03);color:#5C5A7A;font-family:DM Mono,monospace;font-size:12px;';
+      div.textContent = '⏳ ' + item.source.slice(0, 40) + (item.source.length > 40 ? '...' : '');
+      sec.appendChild(div);
+    });
+    digest.appendChild(sec);
+  }
+
   for (const type of DEMO_TYPE_ORDER) {
     const items = demoExtracted.filter(e => e.type === type);
     if (!items.length) continue;
@@ -639,14 +654,24 @@ async function demoCallAPI(text) {
 }
 
 window.demoSend = async function(text) {
-  if (demoLoading) return;
   if (demoExtracted.some(e => e.source === text)) return;
-  demoSetLoading(true);
+
+  // Optimistic: add placeholder immediately
+  const placeholder = { type: '__loading', title: 'Analyzing...', source: text };
+  demoExtracted.push(placeholder);
+  demoRenderChips();
+  demoRenderDigest();
+
   try {
     const result = await demoCallAPI(text);
-    if (result.type) demoExtracted.push({ ...result, source: text });
-  } catch(_) {}
-  demoSetLoading(false);
+    const idx = demoExtracted.findIndex(e => e.source === text && e.type === '__loading');
+    if (idx !== -1) {
+      if (result.type) demoExtracted[idx] = { ...result, source: text };
+      else demoExtracted.splice(idx, 1);
+    }
+  } catch(_) {
+    demoExtracted = demoExtracted.filter(e => !(e.source === text && e.type === '__loading'));
+  }
   demoRenderChips();
   demoRenderDigest();
 };
@@ -654,14 +679,24 @@ window.demoSend = async function(text) {
 window.demoSendCustom = async function() {
   const input = document.getElementById('demo-custom');
   const text  = input.value.trim();
-  if (!text || demoLoading) return;
+  if (!text) return;
   input.value = '';
-  demoSetLoading(true);
+
+  const placeholder = { type: '__loading', title: 'Analyzing...', source: text };
+  demoExtracted.push(placeholder);
+  demoRenderChips();
+  demoRenderDigest();
+
   try {
     const result = await demoCallAPI(text);
-    if (result.type) demoExtracted.push({ ...result, source: text });
-  } catch(_) {}
-  demoSetLoading(false);
+    const idx = demoExtracted.findIndex(e => e.source === text && e.type === '__loading');
+    if (idx !== -1) {
+      if (result.type) demoExtracted[idx] = { ...result, source: text };
+      else demoExtracted.splice(idx, 1);
+    }
+  } catch(_) {
+    demoExtracted = demoExtracted.filter(e => !(e.source === text && e.type === '__loading'));
+  }
   demoRenderChips();
   demoRenderDigest();
 };
@@ -675,6 +710,34 @@ window.demoClear = function() {
 };
 
 demoRenderChips();
+
+// ── Pre-warm all sample messages on page load ─────────────────────────────
+// Fire all 8 API calls immediately so clicking chips is instant
+const demoCache = {};
+
+async function prewarm() {
+  for (const s of DEMO_SAMPLES) {
+    try {
+      const res    = await fetch('/api/demo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: s }),
+      });
+      const result = await res.json();
+      if (result.type) demoCache[s] = result;
+    } catch(_) {}
+  }
+}
+
+// Start pre-warming after 1s so page load isn't blocked
+setTimeout(prewarm, 1000);
+
+// Override demoCallAPI to use cache when available
+const _origCall = demoCallAPI;
+window.demoCallAPI = async function(text) {
+  if (demoCache[text]) return demoCache[text];
+  return _origCall(text);
+};
 
 // ── Modals ───────────────────────────────────────────────────────────────────
 
