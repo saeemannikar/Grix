@@ -23,14 +23,15 @@ Message: "${message.replace(/"/g, "'")}"
 Reply with a JSON object only — no markdown, no explanation:
 {
   "type": "decision" | "task" | "blocker" | "approval" | "decision_change" | null,
-  "title": "concise one-line summary (or null)",
+  "title": "specific one-line summary including the actual subject/value decided (e.g. 'Red chosen as the color' not 'Color choice')",
   "owner": "person's first name if someone is assigned (or null)",
   "due_date": "YYYY-MM-DD if a deadline is mentioned (or null)",
   "priority": "high" | "medium" | "low"
 }
 
 Rules:
-- "decision": something was agreed, settled, or chosen — even implicitly ("yeah red is good" = decision)
+- "decision": something was agreed, settled, or chosen — even implicitly ("yeah red is good" = decision, title should be "Red chosen" not "Color choice")
+- Always include the specific thing in the title — name the color, tool, person, date, etc.
 - "task": someone needs to do something
 - "blocker": something is blocked, waiting, or stuck
 - "approval": something needs sign-off or was approved
