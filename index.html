@@ -579,36 +579,8 @@ function renderDigest() {
   if (!extracted.length) { if(e) e.style.display='block'; return; }
   if(e) e.style.display='none';
 
-<<<<<<< HEAD
-  digest.querySelectorAll('.demo-section-block, .demo-only-you').forEach(e => e.remove());
-
-  if (!demoExtracted.length) {
-    if (empty) empty.style.display = 'block';
-    return;
-  }
-  if (empty) empty.style.display = 'none';
-
-  // Show loading items
-  const loading = demoExtracted.filter(e => e.type === '__loading');
-  if (loading.length) {
-    const sec = document.createElement('div');
-    sec.className = 'demo-section-block';
-    loading.forEach(item => {
-      const div = document.createElement('div');
-      div.className = 'demo-item';
-      div.style.cssText = 'border-left:2px solid #5C5A7A;background:rgba(255,255,255,0.03);color:#5C5A7A;font-family:DM Mono,monospace;font-size:12px;';
-      div.textContent = '⏳ ' + item.source.slice(0, 40) + (item.source.length > 40 ? '...' : '');
-      sec.appendChild(div);
-    });
-    digest.appendChild(sec);
-  }
-
-  for (const type of DEMO_TYPE_ORDER) {
-    const items = demoExtracted.filter(e => e.type === type);
-=======
   for (const type of TYPE_ORDER) {
     const items = extracted.filter(i => i.type === type);
->>>>>>> 7fbb80a ( fix callback.js install.js demo.js extraction.js workspace.js dashboard.html index.html)
     if (!items.length) continue;
     const meta = TYPE_META[type];
     const sec  = document.createElement('div');
@@ -645,53 +617,6 @@ async function callAPI(text) {
 setTimeout(() => SAMPLES.forEach(s => callAPI(s).catch(()=>{})), 1200);
 
 window.demoSend = async function(text) {
-<<<<<<< HEAD
-  if (demoExtracted.some(e => e.source === text)) return;
-
-  // Optimistic: add placeholder immediately
-  const placeholder = { type: '__loading', title: 'Analyzing...', source: text };
-  demoExtracted.push(placeholder);
-  demoRenderChips();
-  demoRenderDigest();
-
-  try {
-    const result = await demoCallAPI(text);
-    const idx = demoExtracted.findIndex(e => e.source === text && e.type === '__loading');
-    if (idx !== -1) {
-      if (result.type) demoExtracted[idx] = { ...result, source: text };
-      else demoExtracted.splice(idx, 1);
-    }
-  } catch(_) {
-    demoExtracted = demoExtracted.filter(e => !(e.source === text && e.type === '__loading'));
-  }
-  demoRenderChips();
-  demoRenderDigest();
-};
-
-window.demoSendCustom = async function() {
-  const input = document.getElementById('demo-custom');
-  const text  = input.value.trim();
-  if (!text) return;
-  input.value = '';
-
-  const placeholder = { type: '__loading', title: 'Analyzing...', source: text };
-  demoExtracted.push(placeholder);
-  demoRenderChips();
-  demoRenderDigest();
-
-  try {
-    const result = await demoCallAPI(text);
-    const idx = demoExtracted.findIndex(e => e.source === text && e.type === '__loading');
-    if (idx !== -1) {
-      if (result.type) demoExtracted[idx] = { ...result, source: text };
-      else demoExtracted.splice(idx, 1);
-    }
-  } catch(_) {
-    demoExtracted = demoExtracted.filter(e => !(e.source === text && e.type === '__loading'));
-  }
-  demoRenderChips();
-  demoRenderDigest();
-=======
   if (extracted.some(e => e.source === text)) return;
   const ph = { type:'__loading', source: text };
   extracted.push(ph);
@@ -712,7 +637,6 @@ window.demoSendCustom = async function() {
   if (!text) return;
   inp.value = '';
   await window.demoSend(text);
->>>>>>> 7fbb80a ( fix callback.js install.js demo.js extraction.js workspace.js dashboard.html index.html)
 };
 
 window.demoClear = function() {
@@ -724,41 +648,9 @@ window.demoClear = function() {
 
 renderChips();
 
-<<<<<<< HEAD
-// ── Pre-warm all sample messages on page load ─────────────────────────────
-// Fire all 8 API calls immediately so clicking chips is instant
-const demoCache = {};
-
-async function prewarm() {
-  for (const s of DEMO_SAMPLES) {
-    try {
-      const res    = await fetch('/api/demo', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: s }),
-      });
-      const result = await res.json();
-      if (result.type) demoCache[s] = result;
-    } catch(_) {}
-  }
-}
-
-// Start pre-warming after 1s so page load isn't blocked
-setTimeout(prewarm, 1000);
-
-// Override demoCallAPI to use cache when available
-const _origCall = demoCallAPI;
-window.demoCallAPI = async function(text) {
-  if (demoCache[text]) return demoCache[text];
-  return _origCall(text);
-};
-
-// ── Modals ───────────────────────────────────────────────────────────────────
-=======
 // ── Modals ────────────────────────────────────────────────────────────────────
 const FS_WAITLIST = 'https://formspree.io/f/mkoewpza';
 const FS_ANALYSIS = 'https://formspree.io/f/xojbaply';
->>>>>>> 7fbb80a ( fix callback.js install.js demo.js extraction.js workspace.js dashboard.html index.html)
 
 function openModal(t) { document.getElementById('modal-'+t).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
