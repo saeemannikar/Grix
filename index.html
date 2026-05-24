@@ -1,547 +1,549 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Grix – The Shadow AI for Slack</title>
-<script src="https://cdn.tailwindcss.com"></script>
 <script defer src="/_vercel/insights/script.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
-  *, *::before, *::after { box-sizing: border-box; }
-  body { font-family: 'DM Sans', sans-serif; background: #0A0A0F; color: #E8E6FF; margin: 0; }
-  .mono { font-family: 'DM Mono', monospace; }
- 
-  .noise {
-    position: fixed; inset: 0; pointer-events: none; z-index: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-    opacity: 0.4;
-  }
- 
-  .glow-dot {
-    position: fixed; border-radius: 50%; filter: blur(120px); pointer-events: none; z-index: 0;
-  }
- 
-  .badge {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: rgba(120, 100, 255, 0.12); border: 1px solid rgba(120, 100, 255, 0.3);
-    color: #A89CFF; font-size: 12px; font-weight: 500; padding: 4px 12px;
-    border-radius: 99px; letter-spacing: 0.04em;
-  }
- 
-  .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: #7B6EF8; animation: pulse 2s infinite; }
-  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity: 0.3; } }
- 
-  .btn-primary {
-    display: inline-flex; align-items: center; gap: 8px;
-    background: #5A4EE8; color: #fff; font-family: 'DM Sans', sans-serif;
-    font-size: 15px; font-weight: 500; padding: 13px 28px;
-    border-radius: 10px; border: none; cursor: pointer;
-    transition: background 0.2s, transform 0.1s; text-decoration: none;
-  }
-  .btn-primary:hover { background: #4A3ED8; transform: translateY(-1px); }
-  .btn-primary:active { transform: translateY(0); }
- 
-  .btn-ghost {
-    display: inline-flex; align-items: center; gap: 8px;
-    background: transparent; color: #A89CFF; font-family: 'DM Sans', sans-serif;
-    font-size: 15px; font-weight: 500; padding: 13px 28px;
-    border-radius: 10px; border: 1px solid rgba(120, 100, 255, 0.3);
-    cursor: pointer; transition: background 0.2s, border-color 0.2s; text-decoration: none;
-  }
-  .btn-ghost:hover { background: rgba(120,100,255,0.08); border-color: rgba(120,100,255,0.5); }
- 
-  .card {
-    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 16px; padding: 28px;
-  }
-  .card:hover { background: rgba(255,255,255,0.05); border-color: rgba(120,100,255,0.2); transition: all 0.2s; }
- 
-  .input {
-    width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-    color: #E8E6FF; font-family: 'DM Sans', sans-serif; font-size: 15px;
-    padding: 12px 16px; border-radius: 10px; outline: none; transition: border-color 0.2s;
-  }
-  .input::placeholder { color: rgba(200,195,255,0.35); }
-  .input:focus { border-color: #5A4EE8; }
- 
-  select.input option { background: #1A1830; color: #E8E6FF; }
- 
-  .label { display: block; font-size: 13px; font-weight: 500; color: #A89CFF; margin-bottom: 6px; }
- 
-  .divider { height: 1px; background: rgba(255,255,255,0.07); margin: 48px 0; }
- 
-  .tag {
-    font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 99px;
-    background: rgba(120,100,255,0.15); color: #A89CFF; border: 1px solid rgba(120,100,255,0.2);
-  }
- 
-  .step-num {
-    width: 32px; height: 32px; border-radius: 50%; background: rgba(90,78,232,0.2);
-    border: 1px solid rgba(90,78,232,0.4); color: #A89CFF;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 13px; font-weight: 600; flex-shrink: 0;
-  }
- 
-  .slack-mockup {
-    background: #1A1A2E; border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 12px; padding: 20px; font-size: 13px;
-  }
-  .slack-msg { display: flex; gap: 10px; margin-bottom: 14px; }
-  .slack-av {
-    width: 32px; height: 32px; border-radius: 6px; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600;
-  }
-  .slack-name { font-size: 12px; font-weight: 600; color: #A89CFF; margin-bottom: 3px; }
-  .slack-text { color: #C5C2E8; line-height: 1.5; }
- 
-  .report-box {
-    background: #0F0F1E; border: 1px solid rgba(90,78,232,0.3);
-    border-radius: 12px; padding: 20px;
-  }
-  .report-item { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 12px; }
-  .report-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
- 
-  .modal-overlay {
-    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8);
-    z-index: 100; align-items: center; justify-content: center; padding: 20px;
-  }
-  .modal-overlay.open { display: flex; }
-  .modal {
-    background: #12111E; border: 1px solid rgba(120,100,255,0.2);
-    border-radius: 20px; padding: 36px; max-width: 500px; width: 100%;
-    max-height: 90vh; overflow-y: auto;
-    animation: slideUp 0.2s ease;
-  }
-  @keyframes slideUp { from { opacity:0; transform: translateY(16px); } to { opacity:1; transform:translateY(0); } }
- 
-  .toast {
-    display: none; position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-    background: #5A4EE8; color: #fff; padding: 14px 28px; border-radius: 10px;
-    font-size: 14px; font-weight: 500; z-index: 200;
-    animation: fadeInUp 0.3s ease;
-  }
-  .toast.show { display: block; }
-  @keyframes fadeInUp { from { opacity:0; transform: translateX(-50%) translateY(8px); } to { opacity:1; transform: translateX(-50%) translateY(0); } }
- 
-  .counter {
-    font-family: 'DM Mono', monospace; font-size: 48px; font-weight: 500;
-    color: #7B6EF8; letter-spacing: -2px;
-  }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
-  /* ── Demo widget ── */
-  .demo-section {
-    position: relative; z-index: 1;
-    max-width: 860px; margin: 0 auto; padding: 0 24px 80px;
-  }
-  .demo-box {
-    background: rgba(255,255,255,0.02);
-    border: 1px solid rgba(120,100,255,0.25);
-    border-radius: 20px; padding: 32px;
-  }
-  .demo-header { text-align: center; margin-bottom: 28px; }
-  .demo-header h2 { font-size: 22px; font-weight: 600; letter-spacing: -0.4px; margin-bottom: 6px; }
-  .demo-header p { font-size: 14px; color: #8C89B8; }
+:root {
+  --bg: #04040d;
+  --ink: #e8e6ff;
+  --muted: #6b6880;
+  --faint: #1a1828;
+  --purple: #7b6ef8;
+  --purple-dim: rgba(123,110,248,0.15);
+  --border: rgba(255,255,255,0.07);
+  --sans: 'DM Sans', sans-serif;
+  --mono: 'DM Mono', monospace;
+}
 
-  /* two-column layout */
-  .demo-cols {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    align-items: start;
-  }
-  @media(max-width:640px) { .demo-cols { grid-template-columns: 1fr; } }
+html { scroll-behavior: smooth; }
+body { font-family: var(--sans); background: var(--bg); color: var(--ink); overflow-x: hidden; }
 
-  .demo-panel {
-    background: rgba(255,255,255,0.02);
-    border: 1px solid rgba(255,255,255,0.07);
-    border-radius: 14px; overflow: hidden;
-  }
-  .demo-panel-header {
-    padding: 12px 16px;
-    border-bottom: 1px solid rgba(255,255,255,0.07);
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .demo-panel-title {
-    font-family: 'DM Mono', monospace; font-size: 11px;
-    text-transform: uppercase; letter-spacing: 0.1em; color: #5C5A7A;
-  }
-  .demo-live-dot {
-    width: 6px; height: 6px; background: #22c55e; border-radius: 50%;
-    animation: pulse 2s infinite;
-  }
+/* ── Canvas ── */
+#bg-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
 
-  /* chip list */
-  .demo-chips { padding: 10px; display: flex; flex-direction: column; gap: 5px; }
-  .demo-chip {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.07);
-    border-radius: 8px; padding: 7px 11px;
-    font-size: 13px; color: #C5C2E8;
-    cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 8px;
-    transition: all 0.15s;
-  }
-  .demo-chip:hover { border-color: #5A4EE8; background: rgba(90,78,232,0.08); }
-  .demo-chip.sent { border-color: rgba(90,78,232,0.4); background: rgba(90,78,232,0.08); }
-  .demo-chip-hint { font-family:'DM Mono',monospace; font-size:10px; color:#5C5A7A; white-space:nowrap; }
-  .demo-chip.sent .demo-chip-hint { color: #22c55e; }
+/* ── Nav ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: 60px; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 40px;
+  background: rgba(4,4,13,0.7);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); font-size: 18px; font-weight: 600; letter-spacing: -0.4px; }
+.nav-logo-icon { width: 30px; height: 30px; background: var(--purple); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+.nav-logo-icon svg { width: 17px; height: 17px; }
+.nav-right { display: flex; align-items: center; gap: 16px; }
+.nav-link { font-size: 14px; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+.nav-link:hover { color: var(--ink); }
+.btn { display: inline-flex; align-items: center; gap: 6px; font-family: var(--sans); font-size: 14px; font-weight: 500; padding: 9px 20px; border-radius: 9px; border: none; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+.btn-primary { background: var(--purple); color: #fff; }
+.btn-primary:hover { background: #6a5ee8; transform: translateY(-1px); }
+.btn-ghost { background: transparent; color: var(--purple); border: 1px solid rgba(123,110,248,0.35); }
+.btn-ghost:hover { background: var(--purple-dim); }
 
-  /* custom input row */
-  .demo-input-row {
-    padding: 10px;
-    border-top: 1px solid rgba(255,255,255,0.07);
-    display: flex; gap: 6px;
-  }
-  .demo-input-row input {
-    flex: 1; background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 8px; padding: 7px 11px;
-    font-family: 'DM Sans', sans-serif; font-size: 13px; color: #E8E6FF; outline: none;
-    transition: border-color 0.15s;
-  }
-  .demo-input-row input:focus { border-color: #5A4EE8; }
-  .demo-input-row input::placeholder { color: rgba(200,195,255,0.3); }
-  .demo-input-row button {
-    background: #5A4EE8; border: none; border-radius: 8px;
-    padding: 7px 14px; font-family: 'DM Mono', monospace;
-    font-size: 11px; color: #fff; cursor: pointer; transition: opacity 0.15s;
-  }
-  .demo-input-row button:hover { opacity: 0.85; }
+/* ── Hero ── */
+.hero {
+  position: relative; z-index: 1;
+  min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center;
+  padding: 120px 24px 60px;
+}
 
-  /* digest panel */
-  .demo-digest-body { padding: 14px; min-height: 200px; }
-  .demo-digest-greeting { font-size: 14px; font-weight: 600; letter-spacing: -0.3px; margin-bottom: 14px; color: #E8E6FF; }
-  .demo-empty { font-family:'DM Mono',monospace; font-size:12px; color:#5C5A7A; padding:32px 0; text-align:center; }
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--mono); font-size: 11px; color: var(--purple);
+  background: rgba(123,110,248,0.1); border: 1px solid rgba(123,110,248,0.25);
+  padding: 5px 14px; border-radius: 99px; letter-spacing: 0.08em;
+  text-transform: uppercase; margin-bottom: 28px;
+}
+.eyebrow-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--purple); animation: blink 2s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
 
-  .demo-section-block { margin-bottom: 12px; }
-  .demo-section-label {
-    font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500;
-    margin-bottom: 5px; display: flex; align-items: center; gap: 5px;
-  }
-  .demo-item {
-    font-size: 13px; padding: 6px 10px; border-radius: 6px;
-    margin-bottom: 3px; border-left: 2px solid transparent;
-    line-height: 1.4; color: #C5C2E8;
-    animation: gfadeIn 0.3s ease;
-  }
-  @keyframes gfadeIn { from{opacity:0;transform:translateY(3px)} to{opacity:1;transform:none} }
-  .demo-item-meta { font-family:'DM Mono',monospace; font-size:10px; color:#5C5A7A; margin-top:2px; }
+.hero h1 {
+  font-size: clamp(42px, 7vw, 88px);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -3px;
+  margin-bottom: 24px;
+  max-width: 900px;
+}
+.hero h1 em { font-style: normal; color: var(--purple); }
 
-  .demo-item-decision_change { border-left-color:#eab308; background:rgba(234,179,8,0.07); }
-  .demo-item-decision        { border-left-color:#7B6EF8; background:rgba(123,110,248,0.07); }
-  .demo-item-task            { border-left-color:#60a5fa; background:rgba(96,165,250,0.07); }
-  .demo-item-blocker         { border-left-color:#ef4444; background:rgba(239,68,68,0.07); }
-  .demo-item-approval        { border-left-color:#22c55e; background:rgba(34,197,94,0.07); }
+.hero-sub {
+  font-size: clamp(15px, 2vw, 19px);
+  color: var(--muted);
+  max-width: 500px;
+  line-height: 1.7;
+  margin-bottom: 40px;
+}
 
-  .demo-only-you {
-    font-family:'DM Mono',monospace; font-size:10px; color:#5C5A7A;
-    background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07);
-    border-radius:4px; padding:2px 8px; display:inline-block; margin-top:8px;
-  }
+.hero-cta { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 16px; }
+.hero-note { font-family: var(--mono); font-size: 11px; color: var(--muted); }
 
-  html { scroll-behavior: smooth; }
+.scroll-hint {
+  position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase;
+  animation: float 3s ease-in-out infinite;
+}
+@keyframes float { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(-6px)} }
+.scroll-hint-line { width: 1px; height: 32px; background: linear-gradient(to bottom, var(--muted), transparent); }
+
+/* ── Sections ── */
+.section { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 100px 24px; }
+.section-tag { font-family: var(--mono); font-size: 11px; color: var(--purple); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 16px; }
+.section-title { font-size: clamp(28px, 4vw, 48px); font-weight: 600; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 16px; }
+.section-sub { font-size: 17px; color: var(--muted); line-height: 1.7; max-width: 520px; }
+
+/* ── Mockup ── */
+.mockup-wrap {
+  position: relative; z-index: 1;
+  max-width: 1000px; margin: 0 auto; padding: 0 24px 100px;
+}
+.mockup-grid { display: grid; grid-template-columns: 1fr 40px 1fr; align-items: center; gap: 0; }
+.slack-panel {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 16px; padding: 24px;
+}
+.panel-label { font-family: var(--mono); font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px; }
+.msg { display: flex; gap: 10px; margin-bottom: 14px; }
+.av { width: 30px; height: 30px; border-radius: 7px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; }
+.msg-name { font-size: 12px; font-weight: 600; color: var(--purple); margin-bottom: 3px; }
+.msg-name span { color: var(--muted); font-weight: 400; }
+.msg-text { font-size: 13px; color: #c5c2e8; line-height: 1.55; }
+.arrow-col { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.arrow-circle { width: 32px; height: 32px; border-radius: 50%; background: rgba(123,110,248,0.1); border: 1px solid rgba(123,110,248,0.25); display: flex; align-items: center; justify-content: center; }
+.arrow-label { font-family: var(--mono); font-size: 9px; color: var(--muted); writing-mode: vertical-rl; letter-spacing: 0.1em; text-transform: uppercase; }
+.report-panel {
+  background: rgba(123,110,248,0.05);
+  border: 1px solid rgba(123,110,248,0.2);
+  border-radius: 16px; padding: 24px;
+}
+.report-label { font-family: var(--mono); font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px; }
+.report-row { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 14px; }
+.report-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+.report-type { font-size: 11px; font-weight: 600; color: var(--purple); margin-bottom: 3px; font-family: var(--mono); }
+.report-content { font-size: 13px; color: #c5c2e8; line-height: 1.55; }
+
+/* ── Demo ── */
+.demo-wrap {
+  position: relative; z-index: 1;
+  max-width: 880px; margin: 0 auto; padding: 0 24px 100px;
+}
+.demo-box {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(123,110,248,0.2);
+  border-radius: 20px; padding: 36px;
+}
+.demo-head { text-align: center; margin-bottom: 32px; }
+.demo-head-tag { font-family: var(--mono); font-size: 11px; color: var(--purple); text-transform: uppercase; letter-spacing: 0.1em; background: rgba(123,110,248,0.1); border: 1px solid rgba(123,110,248,0.2); padding: 4px 12px; border-radius: 99px; display: inline-block; margin-bottom: 14px; }
+.demo-head h2 { font-size: 26px; font-weight: 600; letter-spacing: -0.8px; margin-bottom: 8px; }
+.demo-head p { font-size: 14px; color: var(--muted); }
+.demo-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media(max-width:640px){.demo-cols,.mockup-grid{grid-template-columns:1fr}.arrow-col{display:none}}
+.demo-panel { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+.demo-panel-hd { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.demo-panel-title { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+.live-dot { width: 6px; height: 6px; background: #22c55e; border-radius: 50%; animation: blink 2s infinite; }
+.demo-chips { padding: 10px; display: flex; flex-direction: column; gap: 5px; }
+.demo-chip { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; font-size: 13px; color: #c5c2e8; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 8px; transition: all 0.15s; }
+.demo-chip:hover { border-color: var(--purple); background: rgba(123,110,248,0.08); }
+.demo-chip.sent { border-color: rgba(123,110,248,0.4); background: rgba(123,110,248,0.08); }
+.demo-chip-hint { font-family: var(--mono); font-size: 10px; color: var(--muted); white-space: nowrap; }
+.demo-chip.sent .demo-chip-hint { color: #22c55e; }
+.demo-input-row { padding: 10px; border-top: 1px solid var(--border); display: flex; gap: 6px; }
+.demo-input-row input { flex: 1; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; font-family: var(--sans); font-size: 13px; color: var(--ink); outline: none; transition: border-color 0.15s; }
+.demo-input-row input:focus { border-color: var(--purple); }
+.demo-input-row input::placeholder { color: var(--muted); }
+.demo-input-row button { background: var(--purple); border: none; border-radius: 8px; padding: 8px 14px; font-family: var(--mono); font-size: 11px; color: #fff; cursor: pointer; transition: opacity 0.15s; }
+.demo-input-row button:hover { opacity: 0.85; }
+.demo-digest { padding: 14px; min-height: 220px; }
+.demo-greeting { font-size: 14px; font-weight: 600; letter-spacing: -0.3px; margin-bottom: 14px; }
+.demo-empty-state { font-family: var(--mono); font-size: 12px; color: var(--muted); padding: 32px 0; text-align: center; }
+.demo-sec { margin-bottom: 12px; }
+.demo-sec-label { font-family: var(--mono); font-size: 11px; font-weight: 500; margin-bottom: 5px; display: flex; align-items: center; gap: 5px; }
+.demo-item { font-size: 13px; padding: 6px 10px; border-radius: 6px; margin-bottom: 3px; border-left: 2px solid transparent; line-height: 1.4; color: #c5c2e8; animation: fadeUp 0.3s ease; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(3px)} to{opacity:1;transform:none} }
+.demo-item-meta { font-family: var(--mono); font-size: 10px; color: var(--muted); margin-top: 2px; }
+.demo-item-decision_change { border-left-color:#eab308; background:rgba(234,179,8,0.07); }
+.demo-item-decision { border-left-color:#7B6EF8; background:rgba(123,110,248,0.07); }
+.demo-item-task { border-left-color:#60a5fa; background:rgba(96,165,250,0.07); }
+.demo-item-blocker { border-left-color:#ef4444; background:rgba(239,68,68,0.07); }
+.demo-item-approval { border-left-color:#22c55e; background:rgba(34,197,94,0.07); }
+.only-you { font-family: var(--mono); font-size: 10px; color: var(--muted); background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 4px; padding: 2px 8px; display: inline-block; margin-top: 8px; }
+.demo-cta { text-align: center; margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--border); }
+.demo-cta p { font-family: var(--mono); font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+.demo-cta-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+/* ── Stats ── */
+.stats-row { display: flex; justify-content: center; gap: 60px; flex-wrap: wrap; padding: 60px 24px; position: relative; z-index: 1; }
+.stat { text-align: center; }
+.stat-num { font-family: var(--mono); font-size: 52px; font-weight: 500; color: var(--purple); letter-spacing: -3px; line-height: 1; }
+.stat-label { font-size: 13px; color: var(--muted); margin-top: 6px; }
+
+/* ── How it works ── */
+.how-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 48px; }
+.how-card { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 16px; padding: 28px; transition: all 0.2s; }
+.how-card:hover { background: rgba(255,255,255,0.04); border-color: rgba(123,110,248,0.25); transform: translateY(-2px); }
+.how-card:last-child { border-color: rgba(123,110,248,0.3); }
+.how-num { width: 30px; height: 30px; border-radius: 50%; background: rgba(123,110,248,0.15); border: 1px solid rgba(123,110,248,0.3); color: var(--purple); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; margin-bottom: 16px; }
+.how-card h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+.how-card p { font-size: 14px; color: var(--muted); line-height: 1.65; }
+
+/* ── Divider ── */
+.divider { height: 1px; background: var(--border); max-width: 1100px; margin: 0 auto; position: relative; z-index: 1; }
+
+/* ── CTA ── */
+.cta-section { position: relative; z-index: 1; text-align: center; padding: 100px 24px 140px; }
+.cta-section h2 { font-size: clamp(28px, 4vw, 52px); font-weight: 600; letter-spacing: -2px; margin-bottom: 16px; }
+.cta-section p { font-size: 17px; color: var(--muted); margin-bottom: 36px; }
+
+/* ── Footer ── */
+footer { position: relative; z-index: 1; border-top: 1px solid var(--border); padding: 28px 24px; text-align: center; }
+footer p { font-size: 13px; color: var(--muted); }
+footer a { color: var(--purple); text-decoration: none; }
+
+/* ── Modals ── */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 200; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
+.modal-overlay.open { display: flex; }
+.modal { background: #0d0d1a; border: 1px solid rgba(123,110,248,0.2); border-radius: 20px; padding: 36px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; animation: modalIn 0.2s ease; }
+@keyframes modalIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:none} }
+.modal-title { font-size: 22px; font-weight: 600; letter-spacing: -0.5px; }
+.modal-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 22px; line-height: 1; transition: color 0.15s; }
+.modal-close:hover { color: var(--ink); }
+.field { margin-bottom: 18px; }
+.field label { display: block; font-size: 13px; font-weight: 500; color: var(--purple); margin-bottom: 6px; }
+.field input, .field select { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--ink); font-family: var(--sans); font-size: 15px; padding: 12px 16px; border-radius: 10px; outline: none; transition: border-color 0.2s; -webkit-appearance: none; }
+.field input::placeholder { color: rgba(200,195,255,0.35); }
+.field input:focus, .field select:focus { border-color: var(--purple); }
+.field select option { background: #1a1828; }
+.btn-full { width: 100%; justify-content: center; padding: 14px; font-size: 15px; }
+.modal-note { font-size: 12px; color: var(--muted); text-align: center; margin-top: 10px; }
+
+/* ── Thank you ── */
+.toast { display: none; position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--purple); color: #fff; padding: 14px 28px; border-radius: 10px; font-size: 14px; font-weight: 500; z-index: 300; animation: toastIn 0.3s ease; }
+.toast.show { display: block; }
+@keyframes toastIn { from{opacity:0;transform:translateX(-50%) translateY(8px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
 </style>
 </head>
 <body>
- 
-<div class="noise"></div>
-<div class="glow-dot" style="width:600px;height:600px;top:-200px;left:-100px;background:#3A30B0;opacity:0.15;"></div>
-<div class="glow-dot" style="width:400px;height:400px;bottom:0;right:-100px;background:#1A8070;opacity:0.1;"></div>
- 
+
+<canvas id="bg-canvas"></canvas>
+
 <!-- NAV -->
-<nav style="position:sticky;top:0;z-index:50;backdrop-filter:blur(20px);background:rgba(10,10,15,0.8);border-bottom:1px solid rgba(255,255,255,0.06);">
-  <div style="max-width:1100px;margin:0 auto;padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;">
-    <div style="display:flex;align-items:center;gap:8px;">
-      <div style="width:28px;height:28px;background:#5A4EE8;border-radius:7px;display:flex;align-items:center;justify-content:center;">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 4h10M3 8h7M3 12h4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
-      </div>
-      <span style="font-size:17px;font-weight:600;letter-spacing:-0.3px;">Grix</span>
+<nav>
+  <a class="nav-logo" href="/">
+    <div class="nav-logo-icon">
+      <svg viewBox="0 0 17 17" fill="none"><path d="M3 4h11M3 8.5h7M3 13h9" stroke="white" stroke-width="1.6" stroke-linecap="round"/></svg>
     </div>
-    <div style="display:flex;align-items:center;gap:12px;">
-      <a href="#how" style="font-size:14px;color:#8C89B8;text-decoration:none;">How it works</a>
-      <button class="btn-primary" style="padding:9px 20px;font-size:14px;" onclick="openModal('waitlist')">Join waitlist</button>
-    </div>
+    Grix
+  </a>
+  <div class="nav-right">
+    <a class="nav-link" href="#how">How it works</a>
+    <button class="btn btn-primary" onclick="openModal('waitlist')">Join waitlist</button>
   </div>
 </nav>
- 
+
 <!-- HERO -->
-<section style="position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:60px 24px 28px;text-align:center;">
-  <div style="margin-bottom:16px;">
-    <span class="badge"><span class="badge-dot"></span> Limited – first 5 teams get free analysis</span>
+<section class="hero">
+  <div class="hero-eyebrow"><span class="eyebrow-dot"></span> First 5 teams · Free analysis</div>
+  <h1>Your team's decisions,<br><em>never lost again.</em></h1>
+  <p class="hero-sub">Grix watches your Slack silently and surfaces every decision, task, and blocker the moment you open it — before you even ask.</p>
+  <div class="hero-cta">
+    <a class="btn btn-primary" href="/api/slack/install">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>
+      Add to Slack
+    </a>
+    <button class="btn btn-ghost" onclick="openModal('freeanalysis')">✦ Get free analysis</button>
   </div>
-  <h1 style="font-size:clamp(32px,5vw,60px);font-weight:600;line-height:1.1;letter-spacing:-2px;margin:0 0 16px;">
-    The Shadow AI for <span style="color:#7B6EF8;">Slack</span>
-  </h1>
-  <p style="font-size:clamp(15px,2vw,18px);color:#8C89B8;max-width:500px;margin:0 auto 12px;line-height:1.6;">
-    Decisions, tasks, and blockers — extracted from your Slack, delivered before you even ask.
-  </p>
-  <p style="font-size:13px;color:#5C5A7A;">Try it below ↓</p>
+  <p class="hero-note">No credit card · Takes 30 seconds</p>
+  <div class="scroll-hint">
+    <div class="scroll-hint-line"></div>
+    scroll
+  </div>
 </section>
 
-<!-- LIVE DEMO WIDGET -->
-<section class="demo-section" id="demo">
-  <div class="demo-box">
-    <div class="demo-header">
-      <div style="margin-bottom:10px;"><span class="tag">Live demo — no signup needed</span></div>
-      <h2>Grix doesn't wait to be asked.</h2>
-      <p>Click any message. Type your own. Try typos, slang, anything — Grix gets it.</p>
+<!-- MOCKUP -->
+<div class="mockup-wrap">
+  <div class="mockup-grid">
+    <div class="slack-panel">
+      <div class="panel-label"># product-decisions</div>
+      <div class="msg">
+        <div class="av" style="background:#3b3580;">PK</div>
+        <div><div class="msg-name">Priya K. <span>2:14 PM</span></div><div class="msg-text">Ok so we're going with Stripe for payments, Vercel for hosting. Marco can you own auth by Thursday?</div></div>
+      </div>
+      <div class="msg">
+        <div class="av" style="background:#2d5040;">MD</div>
+        <div><div class="msg-name">Marco D. <span>2:17 PM</span></div><div class="msg-text">Yeah on auth. Should we block v2 until payments is done?</div></div>
+      </div>
+      <div class="msg">
+        <div class="av" style="background:#503020;">AR</div>
+        <div><div class="msg-name">Ayasha R. <span>2:21 PM</span></div><div class="msg-text">Yes block v2 on payments. I'll update the roadmap.</div></div>
+      </div>
     </div>
+    <div class="arrow-col">
+      <div class="arrow-circle"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="#7b6ef8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="arrow-label">Grix</div>
+    </div>
+    <div class="report-panel">
+      <div class="report-label">Decision report · May 14</div>
+      <div class="report-row"><div class="report-icon">🟣</div><div><div class="report-type">Decisions</div><div class="report-content">Stripe for payments · Vercel for hosting · Block v2 on payments</div></div></div>
+      <div class="report-row"><div class="report-icon">🔵</div><div><div class="report-type">Tasks</div><div class="report-content">Marco → auth by Thursday · Ayasha → update roadmap</div></div></div>
+      <div class="report-row" style="margin-bottom:0"><div class="report-icon">🔴</div><div><div class="report-type">Blocker</div><div class="report-content">v2 blocked until payments done</div></div></div>
+    </div>
+  </div>
+</div>
 
+<!-- DEMO -->
+<div class="demo-wrap" id="demo">
+  <div class="demo-box">
+    <div class="demo-head">
+      <div class="demo-head-tag">Live demo — no signup needed</div>
+      <h2>Grix doesn't wait to be asked.</h2>
+      <p>Click any message. Type your own. Typos, slang, anything — Grix gets it.</p>
+    </div>
     <div class="demo-cols">
-      <!-- Left: messages -->
       <div class="demo-panel">
-        <div class="demo-panel-header">
-          <span class="demo-panel-title"># general</span>
-          <span class="demo-live-dot"></span>
-        </div>
+        <div class="demo-panel-hd"><span class="demo-panel-title"># general</span><span class="live-dot"></span></div>
         <div class="demo-chips" id="demo-chips"></div>
         <div class="demo-input-row">
-          <input type="text" id="demo-custom" placeholder="Type anything your team would say..." onkeydown="if(event.key==='Enter') demoSendCustom()" />
+          <input type="text" id="demo-custom" placeholder="Type anything your team would say..." onkeydown="if(event.key==='Enter') demoSendCustom()"/>
           <button onclick="demoSendCustom()">Send</button>
         </div>
       </div>
-
-      <!-- Right: digest -->
       <div class="demo-panel">
-        <div class="demo-panel-header">
+        <div class="demo-panel-hd">
           <span class="demo-panel-title">Grix · Your digest</span>
-          <button onclick="demoClear()" style="background:transparent;border:1px solid rgba(255,255,255,0.07);border-radius:5px;padding:2px 8px;font-family:'DM Mono',monospace;font-size:10px;color:#5C5A7A;cursor:pointer;">Clear</button>
+          <button onclick="demoClear()" style="background:transparent;border:1px solid var(--border);border-radius:5px;padding:2px 8px;font-family:var(--mono);font-size:10px;color:var(--muted);cursor:pointer;">Clear</button>
         </div>
-        <div class="demo-digest-body" id="demo-digest">
-          <div class="demo-digest-greeting">Good morning. Here's what happened.</div>
-          <div class="demo-empty" id="demo-empty">← Click a message to see Grix extract it.</div>
+        <div class="demo-digest" id="demo-digest">
+          <div class="demo-greeting">Good morning. Here's what happened.</div>
+          <div class="demo-empty-state" id="demo-empty">← Click a message to see Grix extract it.</div>
         </div>
       </div>
+    </div>
+    <div class="demo-cta">
+      <p>Want this running in your Slack automatically?</p>
+      <div class="demo-cta-btns">
+        <a class="btn btn-primary" href="/api/slack/install">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>
+          Add to Slack
+        </a>
+        <a class="btn btn-ghost" href="/dashboard?workspace_id=demo">View dashboard →</a>
+      </div>
+      <p style="font-size:11px;margin-top:10px;">Free to try · No credit card · 30 seconds</p>
     </div>
   </div>
-</section>
+</div>
 
-<!-- SOCIAL PROOF -->
-<section style="position:relative;z-index:1;text-align:center;padding:0 24px 80px;">
-  <p style="font-size:13px;color:#5C5A7A;margin-bottom:24px;">Trusted by teams who are tired of forgetting decisions</p>
-  <div style="display:flex;justify-content:center;gap:40px;flex-wrap:wrap;">
-    <div><div class="counter">47</div><div style="font-size:13px;color:#5C5A7A;margin-top:4px;">Slack channels analysed</div></div>
-    <div><div class="counter">1.2k</div><div style="font-size:13px;color:#5C5A7A;margin-top:4px;">Decisions extracted</div></div>
-    <div><div class="counter">5</div><div style="font-size:13px;color:#5C5A7A;margin-top:4px;">Free spots left</div></div>
-  </div>
-</section>
- 
-<div class="divider" style="max-width:1100px;margin:0 auto;padding:0 24px;"></div>
+<!-- STATS -->
+<div class="stats-row">
+  <div class="stat"><div class="stat-num">47</div><div class="stat-label">Slack channels analysed</div></div>
+  <div class="stat"><div class="stat-num">1.2k</div><div class="stat-label">Decisions extracted</div></div>
+  <div class="stat"><div class="stat-num">5</div><div class="stat-label">Free spots left</div></div>
+</div>
 
-<!-- SLACK MOCKUP (how it works example) -->
-<section style="position:relative;z-index:1;max-width:900px;margin:0 auto;padding:0 24px 100px;">
-  <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:20px;">
-    <div class="slack-mockup">
-      <div style="font-size:11px;font-weight:600;color:#5C5A7A;letter-spacing:0.06em;margin-bottom:14px;">#product-decisions</div>
-      <div class="slack-msg">
-        <div class="slack-av" style="background:#3B3580;">PK</div>
-        <div>
-          <div class="slack-name">Priya K. <span style="font-weight:400;color:#5C5A7A;font-size:11px;">2:14 PM</span></div>
-          <div class="slack-text">Ok so we're going with Stripe for payments, Vercel for hosting. Marco can you own the auth piece by Thursday?</div>
-        </div>
-      </div>
-      <div class="slack-msg">
-        <div class="slack-av" style="background:#2D5040;">MD</div>
-        <div>
-          <div class="slack-name">Marco D. <span style="font-weight:400;color:#5C5A7A;font-size:11px;">2:17 PM</span></div>
-          <div class="slack-text">Yes on auth. Should we block the v2 launch until payments is done?</div>
-        </div>
-      </div>
-      <div class="slack-msg">
-        <div class="slack-av" style="background:#503020;">AR</div>
-        <div>
-          <div class="slack-name">Ayasha R. <span style="font-weight:400;color:#5C5A7A;font-size:11px;">2:21 PM</span></div>
-          <div class="slack-text">Yes let's block v2 on payments. I'll update the roadmap.</div>
-        </div>
-      </div>
-    </div>
-    <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
-      <div style="width:36px;height:36px;background:rgba(90,78,232,0.15);border:1px solid rgba(90,78,232,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#7B6EF8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </div>
-      <div class="mono" style="font-size:10px;color:#5C5A7A;writing-mode:vertical-rl;">Grix</div>
-    </div>
-    <div class="report-box">
-      <div style="font-size:11px;font-weight:600;color:#5C5A7A;letter-spacing:0.06em;margin-bottom:16px;">DECISION REPORT · MAY 14</div>
-      <div class="report-item">
-        <div class="report-icon">🟢</div>
-        <div>
-          <div style="font-size:12px;font-weight:600;color:#A89CFF;margin-bottom:2px;">Decisions made</div>
-          <div style="font-size:13px;color:#C5C2E8;">Use Stripe for payments<br/>Use Vercel for hosting<br/>Block v2 on payments completion</div>
-        </div>
-      </div>
-      <div class="report-item">
-        <div class="report-icon">🔵</div>
-        <div>
-          <div style="font-size:12px;font-weight:600;color:#A89CFF;margin-bottom:2px;">Action items</div>
-          <div style="font-size:13px;color:#C5C2E8;">Marco → auth by Thursday<br/>Ayasha → update roadmap</div>
-        </div>
-      </div>
-      <div class="report-item" style="margin-bottom:0;">
-        <div class="report-icon">🟡</div>
-        <div>
-          <div style="font-size:12px;font-weight:600;color:#A89CFF;margin-bottom:2px;">Blockers</div>
-          <div style="font-size:13px;color:#C5C2E8;">v2 launch blocked until payments done</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
+<div class="divider"></div>
 
 <!-- HOW IT WORKS -->
-<section id="how" style="position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:80px 24px;">
-  <div style="text-align:center;margin-bottom:56px;">
-    <span class="tag">How it works</span>
-    <h2 style="font-size:36px;font-weight:600;letter-spacing:-1px;margin:16px 0 0;">Simple. Fast. Manual first.</h2>
+<div class="section" id="how">
+  <div class="section-tag">How it works</div>
+  <div class="section-title">Simple. Fast. Proactive.</div>
+  <div class="section-sub">No dashboards to check. No commands to remember. Grix tells you before you ask.</div>
+  <div class="how-grid">
+    <div class="how-card"><div class="how-num">1</div><h3>Install in 30 seconds</h3><p>Click "Add to Slack" and invite Grix to your channels. No setup, no config.</p></div>
+    <div class="how-card"><div class="how-num">2</div><h3>Grix watches silently</h3><p>Every message in every channel is read, understood, and categorized in real time.</p></div>
+    <div class="how-card"><div class="how-num">3</div><h3>You open Slack</h3><p>Grix greets you with everything that happened since you were last active. Before you type anything.</p></div>
+    <div class="how-card" style="border-color:rgba(123,110,248,0.3)"><div class="how-num">4</div><h3>Changed decisions flagged</h3><p>If something was decided then reversed, Grix catches it and tells you exactly what changed to what.</p></div>
   </div>
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;">
-    <div class="card">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-        <div class="step-num">1</div>
-        <span style="font-size:13px;color:#5C5A7A;" class="mono">Sign up</span>
-      </div>
-      <h3 style="font-size:17px;font-weight:600;margin:0 0 10px;">Join the waitlist</h3>
-      <p style="font-size:14px;color:#8C89B8;line-height:1.6;margin:0;">Tell us your Slack workspace and which channel has the most important decisions.</p>
-    </div>
-    <div class="card">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-        <div class="step-num">2</div>
-        <span style="font-size:13px;color:#5C5A7A;" class="mono">Share access</span>
-      </div>
-      <h3 style="font-size:17px;font-weight:600;margin:0 0 10px;">Give us read access</h3>
-      <p style="font-size:14px;color:#8C89B8;line-height:1.6;margin:0;">Invite our analyst to your Slack channel as read-only, or export the last 7 days.</p>
-    </div>
-    <div class="card">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-        <div class="step-num">3</div>
-        <span style="font-size:13px;color:#5C5A7A;" class="mono">We analyse</span>
-      </div>
-      <h3 style="font-size:17px;font-weight:600;margin:0 0 10px;">Get your report</h3>
-      <p style="font-size:14px;color:#8C89B8;line-height:1.6;margin:0;">Within 48 hours, receive a Decision Report: every decision, action item, and blocker extracted.</p>
-    </div>
-    <div class="card" style="border-color:rgba(90,78,232,0.3);">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-        <div class="step-num">4</div>
-        <span style="font-size:13px;color:#5C5A7A;" class="mono">Coming soon</span>
-      </div>
-      <h3 style="font-size:17px;font-weight:600;margin:0 0 10px;">Automate it</h3>
-      <p style="font-size:14px;color:#8C89B8;line-height:1.6;margin:0;">Week 2: the bot does this automatically, every day, for every channel. $49/mo.</p>
-    </div>
-  </div>
-</section>
- 
-<div class="divider" style="max-width:1100px;margin:0 auto;"></div>
- 
-<!-- CTA SECTION -->
-<section style="position:relative;z-index:1;text-align:center;padding:80px 24px 120px;">
-  <h2 style="font-size:clamp(28px,4vw,48px);font-weight:600;letter-spacing:-1.5px;margin:0 0 16px;">Stop losing decisions in Slack.</h2>
-  <p style="font-size:17px;color:#8C89B8;margin:0 0 36px;">First 5 teams get a free manual Decision Report. No setup, no code.</p>
-  <button class="btn-primary" style="font-size:16px;padding:15px 36px;" onclick="openModal('freeanalysis')">
-    ✦ Claim your free analysis
-  </button>
-</section>
- 
+</div>
+
+<div class="divider"></div>
+
+<!-- CTA -->
+<div class="cta-section">
+  <h2>Stop losing decisions in Slack.</h2>
+  <p>First 5 teams get a free manual Decision Report. No setup, no code.</p>
+  <button class="btn btn-primary" style="font-size:16px;padding:15px 36px;" onclick="openModal('freeanalysis')">✦ Claim your free analysis</button>
+</div>
+
 <!-- FOOTER -->
-<footer style="border-top:1px solid rgba(255,255,255,0.06);padding:28px 24px;text-align:center;">
-  <p style="font-size:13px;color:#5C5A7A;margin:0;">© 2026 Grix · Built in public · <a href="mailto:hello@grix.so" style="color:#7B6EF8;text-decoration:none;">hello@grix.so</a></p>
+<footer>
+  <p>© 2026 Grix · Built in public · <a href="mailto:hello@grix.so">hello@grix.so</a></p>
 </footer>
- 
+
 <!-- WAITLIST MODAL -->
 <div class="modal-overlay" id="modal-waitlist" onclick="closeModalOutside(event,'modal-waitlist')">
   <div class="modal">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;">
-      <h2 style="font-size:22px;font-weight:600;margin:0;letter-spacing:-0.5px;">Join the waitlist</h2>
-      <button onclick="closeModal('modal-waitlist')" style="background:none;border:none;color:#5C5A7A;cursor:pointer;font-size:22px;line-height:1;">×</button>
+      <span class="modal-title">Join the waitlist</span>
+      <button class="modal-close" onclick="closeModal('modal-waitlist')">×</button>
     </div>
     <form id="form-waitlist" onsubmit="submitForm(event,'waitlist')">
-      <input type="hidden" name="_subject" value="New Grix Waitlist Signup" />
-      <input type="hidden" name="form_type" value="waitlist" />
-      <div style="margin-bottom:18px;">
-        <label class="label">Work email *</label>
-        <input class="input" type="email" name="email" placeholder="you@company.com" required />
+      <input type="hidden" name="_subject" value="New Grix Waitlist Signup"/>
+      <input type="hidden" name="form_type" value="waitlist"/>
+      <div class="field"><label>Work email *</label><input type="email" name="email" placeholder="you@company.com" required/></div>
+      <div class="field"><label>Slack workspace *</label><input type="text" name="workspace" placeholder="e.g. acme-team" required/></div>
+      <div class="field" style="margin-bottom:28px;"><label>Your role *</label>
+        <select name="role" required><option value="" disabled selected>Select your role</option><option>CTO</option><option>Team Lead</option><option>Product Manager</option><option>Founder</option><option>Engineering Manager</option><option>Other</option></select>
       </div>
-      <div style="margin-bottom:18px;">
-        <label class="label">Slack workspace name *</label>
-        <input class="input" type="text" name="workspace" placeholder="e.g. acme-team" required />
-      </div>
-      <div style="margin-bottom:28px;">
-        <label class="label">Your role *</label>
-        <select class="input" name="role" required>
-          <option value="" disabled selected>Select your role</option>
-          <option>CTO</option>
-          <option>Team Lead</option>
-          <option>Product Manager</option>
-          <option>Founder</option>
-          <option>Engineering Manager</option>
-          <option>Other</option>
-        </select>
-      </div>
-      <button type="submit" class="btn-primary" style="width:100%;justify-content:center;">Join waitlist →</button>
-      <p style="font-size:12px;color:#5C5A7A;text-align:center;margin:12px 0 0;">No spam. Unsubscribe anytime.</p>
+      <button type="submit" class="btn btn-primary btn-full">Join waitlist →</button>
+      <p class="modal-note">No spam. Unsubscribe anytime.</p>
     </form>
   </div>
 </div>
- 
+
 <!-- FREE ANALYSIS MODAL -->
 <div class="modal-overlay" id="modal-freeanalysis" onclick="closeModalOutside(event,'modal-freeanalysis')">
   <div class="modal">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-      <h2 style="font-size:22px;font-weight:600;margin:0;letter-spacing:-0.5px;">Get free analysis</h2>
-      <button onclick="closeModal('modal-freeanalysis')" style="background:none;border:none;color:#5C5A7A;cursor:pointer;font-size:22px;line-height:1;">×</button>
+      <span class="modal-title">Get free analysis</span>
+      <button class="modal-close" onclick="closeModal('modal-freeanalysis')">×</button>
     </div>
-    <p style="font-size:13px;color:#5C5A7A;margin:0 0 24px;">First 5 teams only · Decision Report in 48 hours</p>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:24px;">First 5 teams only · Decision Report in 48 hours</p>
     <form id="form-freeanalysis" onsubmit="submitForm(event,'freeanalysis')">
-      <input type="hidden" name="_subject" value="New Grix Free Analysis Request" />
-      <input type="hidden" name="form_type" value="free_analysis" />
-      <div style="margin-bottom:18px;">
-        <label class="label">Work email *</label>
-        <input class="input" type="email" name="email" placeholder="you@company.com" required />
+      <input type="hidden" name="_subject" value="New Grix Free Analysis Request"/>
+      <input type="hidden" name="form_type" value="free_analysis"/>
+      <div class="field"><label>Work email *</label><input type="email" name="email" placeholder="you@company.com" required/></div>
+      <div class="field"><label>Slack workspace *</label><input type="text" name="workspace" placeholder="e.g. acme-team" required/></div>
+      <div class="field"><label>Your role *</label>
+        <select name="role" required><option value="" disabled selected>Select your role</option><option>CTO</option><option>Team Lead</option><option>Product Manager</option><option>Founder</option><option>Engineering Manager</option><option>Other</option></select>
       </div>
-      <div style="margin-bottom:18px;">
-        <label class="label">Slack workspace name *</label>
-        <input class="input" type="text" name="workspace" placeholder="e.g. acme-team" required />
-      </div>
-      <div style="margin-bottom:18px;">
-        <label class="label">Your role *</label>
-        <select class="input" name="role" required>
-          <option value="" disabled selected>Select your role</option>
-          <option>CTO</option>
-          <option>Team Lead</option>
-          <option>Product Manager</option>
-          <option>Founder</option>
-          <option>Engineering Manager</option>
-          <option>Other</option>
-        </select>
-      </div>
-      <div style="margin-bottom:28px;">
-        <label class="label">Which Slack channel has the most decisions? *</label>
-        <input class="input" type="text" name="slack_channel" placeholder="e.g. #product, #engineering, #general" required />
-      </div>
-      <button type="submit" class="btn-primary" style="width:100%;justify-content:center;">✦ Claim free analysis →</button>
-      <p style="font-size:12px;color:#5C5A7A;text-align:center;margin:12px 0 0;">We'll email you within 24 hours to get Slack access.</p>
+      <div class="field" style="margin-bottom:28px;"><label>Which channel has the most decisions? *</label><input type="text" name="slack_channel" placeholder="e.g. #product, #engineering" required/></div>
+      <button type="submit" class="btn btn-primary btn-full">✦ Claim free analysis →</button>
+      <p class="modal-note">We'll email you within 24 hours to get Slack access.</p>
     </form>
   </div>
 </div>
- 
+
 <!-- THANK YOU MODAL -->
 <div class="modal-overlay" id="modal-thankyou" onclick="closeModalOutside(event,'modal-thankyou')">
   <div class="modal" style="text-align:center;">
     <div style="font-size:48px;margin-bottom:16px;">🎉</div>
-    <h2 style="font-size:24px;font-weight:600;margin:0 0 12px;letter-spacing:-0.5px;">You're in.</h2>
-    <p style="font-size:15px;color:#8C89B8;line-height:1.7;margin:0 0 28px;" id="thankyou-msg">
-      We'll manually review your Slack channel and send you a custom Decision Report within 48 hours.
-    </p>
-    <button class="btn-primary" style="justify-content:center;" onclick="closeModal('modal-thankyou')">Done</button>
+    <h2 style="font-size:24px;font-weight:600;margin-bottom:12px;letter-spacing:-0.5px;">You're in.</h2>
+    <p style="font-size:15px;color:var(--muted);line-height:1.7;margin-bottom:28px;" id="thankyou-msg">We'll manually review your Slack channel and send you a custom Decision Report within 48 hours.</p>
+    <button class="btn btn-primary btn-full" onclick="closeModal('modal-thankyou')">Done</button>
   </div>
 </div>
- 
+
 <div class="toast" id="toast">✓ You're on the list!</div>
 
 <script>
-// ── Demo widget ──────────────────────────────────────────────────────────────
+// ── Night sky canvas ──────────────────────────────────────────────────────────
+(function() {
+  const canvas = document.getElementById('bg-canvas');
+  const ctx    = canvas.getContext('2d');
+  let W, H, stars = [], fireflies = [];
 
-const DEMO_SAMPLES = [
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  function initStars() {
+    stars = [];
+    for (let i = 0; i < 200; i++) {
+      stars.push({
+        x: Math.random() * W,
+        y: Math.random() * H * 0.7,
+        r: Math.random() * 1.2 + 0.2,
+        o: Math.random() * 0.6 + 0.1,
+        twinkle: Math.random() * Math.PI * 2,
+        speed: Math.random() * 0.015 + 0.005,
+      });
+    }
+  }
+
+  function initFireflies() {
+    fireflies = [];
+    for (let i = 0; i < 28; i++) {
+      fireflies.push({
+        x: Math.random() * W,
+        y: Math.random() * H * 0.85 + H * 0.1,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.3,
+        r: Math.random() * 2 + 1,
+        o: Math.random(),
+        phase: Math.random() * Math.PI * 2,
+        speed: Math.random() * 0.02 + 0.008,
+        hue: Math.random() < 0.6 ? 260 : Math.random() < 0.5 ? 200 : 150,
+      });
+    }
+  }
+
+  function drawNebula() {
+    const grd = ctx.createRadialGradient(W * 0.15, H * 0.25, 0, W * 0.15, H * 0.25, W * 0.45);
+    grd.addColorStop(0, 'rgba(60,40,160,0.12)');
+    grd.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = grd; ctx.fillRect(0, 0, W, H);
+
+    const grd2 = ctx.createRadialGradient(W * 0.8, H * 0.15, 0, W * 0.8, H * 0.15, W * 0.35);
+    grd2.addColorStop(0, 'rgba(20,80,120,0.08)');
+    grd2.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = grd2; ctx.fillRect(0, 0, W, H);
+  }
+
+  let t = 0;
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#04040d'; ctx.fillRect(0, 0, W, H);
+    drawNebula();
+
+    // Stars
+    stars.forEach(s => {
+      s.twinkle += s.speed;
+      const alpha = s.o * (0.5 + 0.5 * Math.sin(s.twinkle));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(220,215,255,${alpha})`;
+      ctx.fill();
+    });
+
+    // Fireflies
+    fireflies.forEach(f => {
+      f.phase += f.speed;
+      f.x += f.vx + Math.sin(f.phase * 0.7) * 0.3;
+      f.y += f.vy + Math.cos(f.phase * 0.5) * 0.2;
+      if (f.x < 0) f.x = W; if (f.x > W) f.x = 0;
+      if (f.y < 0) f.y = H; if (f.y > H) f.y = 0;
+
+      const glow = f.o * (0.4 + 0.6 * Math.abs(Math.sin(f.phase)));
+      const grad = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, f.r * 8);
+      grad.addColorStop(0, `hsla(${f.hue},80%,75%,${glow})`);
+      grad.addColorStop(0.4, `hsla(${f.hue},70%,60%,${glow * 0.4})`);
+      grad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.beginPath();
+      ctx.arc(f.x, f.y, f.r * 8, 0, Math.PI * 2);
+      ctx.fillStyle = grad; ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(f.x, f.y, f.r * 0.6, 0, Math.PI * 2);
+      ctx.fillStyle = `hsla(${f.hue},90%,90%,${glow * 0.9})`;
+      ctx.fill();
+    });
+
+    t++;
+    requestAnimationFrame(draw);
+  }
+
+  resize();
+  initStars();
+  initFireflies();
+  draw();
+  window.addEventListener('resize', () => { resize(); initStars(); initFireflies(); });
+})();
+
+// ── Demo widget ───────────────────────────────────────────────────────────────
+const SAMPLES = [
   "yeah red is good",
   "we decided to go with Stripe",
   "John needs to finish the API docs by Friday",
@@ -552,34 +554,32 @@ const DEMO_SAMPLES = [
   "we cant move forward until legal signs off",
 ];
 
-const DEMO_TYPE_META = {
+const TYPE_META = {
   decision_change: { emoji: '⚠️', label: 'Changed Decision', color: '#eab308' },
   decision:        { emoji: '🟣', label: 'Decision',          color: '#7B6EF8' },
   task:            { emoji: '🔵', label: 'Task',              color: '#60a5fa' },
   blocker:         { emoji: '🔴', label: 'Blocker',           color: '#ef4444' },
   approval:        { emoji: '🟢', label: 'Approval',          color: '#22c55e' },
 };
+const TYPE_ORDER = ['decision_change','decision','task','blocker','approval'];
+let extracted = [];
 
-const DEMO_TYPE_ORDER = ['decision_change','decision','task','blocker','approval'];
-
-let demoExtracted = [];
-let demoLoading   = false;
-
-function demoRenderChips() {
-  const el = document.getElementById('demo-chips');
-  el.innerHTML = DEMO_SAMPLES.map(s => {
-    const sent = demoExtracted.some(e => e.source === s);
+function renderChips() {
+  document.getElementById('demo-chips').innerHTML = SAMPLES.map(s => {
+    const sent = extracted.some(e => e.source === s);
     return `<div class="demo-chip ${sent?'sent':''}" onclick="demoSend('${s.replace(/'/g,"\\'")}')">
-      <span>${s}</span>
-      <span class="demo-chip-hint">${sent ? '✓ sent' : 'click'}</span>
-    </div>`;
+      <span>${s}</span><span class="demo-chip-hint">${sent?'✓ sent':'click'}</span></div>`;
   }).join('');
 }
 
-function demoRenderDigest() {
-  const digest = document.getElementById('demo-digest');
-  const empty  = document.getElementById('demo-empty');
+function renderDigest() {
+  const d = document.getElementById('demo-digest');
+  const e = document.getElementById('demo-empty');
+  d.querySelectorAll('.demo-sec,.only-you').forEach(x => x.remove());
+  if (!extracted.length) { if(e) e.style.display='block'; return; }
+  if(e) e.style.display='none';
 
+<<<<<<< HEAD
   digest.querySelectorAll('.demo-section-block, .demo-only-you').forEach(e => e.remove());
 
   if (!demoExtracted.length) {
@@ -605,16 +605,15 @@ function demoRenderDigest() {
 
   for (const type of DEMO_TYPE_ORDER) {
     const items = demoExtracted.filter(e => e.type === type);
+=======
+  for (const type of TYPE_ORDER) {
+    const items = extracted.filter(i => i.type === type);
+>>>>>>> 7fbb80a ( fix callback.js install.js demo.js extraction.js workspace.js dashboard.html index.html)
     if (!items.length) continue;
-
-    const meta = DEMO_TYPE_META[type];
+    const meta = TYPE_META[type];
     const sec  = document.createElement('div');
-    sec.className = 'demo-section-block';
-
-    sec.innerHTML = `<div class="demo-section-label" style="color:${meta.color}">
-      ${meta.emoji} ${meta.label}${items.length > 1 ? ` (${items.length})` : ''}
-    </div>`;
-
+    sec.className = 'demo-sec';
+    sec.innerHTML = `<div class="demo-sec-label" style="color:${meta.color}">${meta.emoji} ${meta.label}${items.length>1?' ('+items.length+')':''}</div>`;
     items.forEach(item => {
       const div = document.createElement('div');
       div.className = `demo-item demo-item-${type}`;
@@ -622,38 +621,31 @@ function demoRenderDigest() {
       if (item.owner || item.due_date) {
         const m = document.createElement('div');
         m.className = 'demo-item-meta';
-        m.textContent = [item.owner ? `→ ${item.owner}` : null, item.due_date ? `due ${item.due_date}` : null].filter(Boolean).join(' · ');
+        m.textContent = [item.owner?`→ ${item.owner}`:null, item.due_date?`due ${item.due_date}`:null].filter(Boolean).join(' · ');
         div.appendChild(m);
       }
       sec.appendChild(div);
     });
-
-    digest.appendChild(sec);
+    d.appendChild(sec);
   }
-
-  const badge = document.createElement('div');
-  badge.className = 'demo-only-you';
-  badge.textContent = 'Only visible to you';
-  digest.appendChild(badge);
+  const b = document.createElement('div');
+  b.className = 'only-you'; b.textContent = 'Only visible to you';
+  d.appendChild(b);
 }
 
-function demoSetLoading(on) {
-  demoLoading = on;
-  const empty = document.getElementById('demo-empty');
-  if (empty) empty.textContent = on ? '⏳ Analyzing...' : '← Click a message to see Grix extract it.';
-  if (on && empty) empty.style.display = 'block';
+// Pre-warm cache
+const cache = {};
+async function callAPI(text) {
+  if (cache[text]) return cache[text];
+  const res = await fetch('/api/demo', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({message:text}) });
+  const data = await res.json();
+  if (data.type) cache[text] = data;
+  return data;
 }
-
-async function demoCallAPI(text) {
-  const res = await fetch('/api/demo', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message: text }),
-  });
-  return await res.json();
-}
+setTimeout(() => SAMPLES.forEach(s => callAPI(s).catch(()=>{})), 1200);
 
 window.demoSend = async function(text) {
+<<<<<<< HEAD
   if (demoExtracted.some(e => e.source === text)) return;
 
   // Optimistic: add placeholder immediately
@@ -699,18 +691,40 @@ window.demoSendCustom = async function() {
   }
   demoRenderChips();
   demoRenderDigest();
+=======
+  if (extracted.some(e => e.source === text)) return;
+  const ph = { type:'__loading', source: text };
+  extracted.push(ph);
+  renderChips(); renderDigest();
+  const e = document.getElementById('demo-empty');
+  if(e && !extracted.filter(x=>x.type!=='__loading').length) { e.style.display='block'; e.textContent='⏳ Analyzing...'; }
+  try {
+    const r = await callAPI(text);
+    const i = extracted.findIndex(x => x.source===text && x.type==='__loading');
+    if (i !== -1) { if(r.type) extracted[i] = {...r, source:text}; else extracted.splice(i,1); }
+  } catch(_) { extracted = extracted.filter(x=>!(x.source===text&&x.type==='__loading')); }
+  renderChips(); renderDigest();
+};
+
+window.demoSendCustom = async function() {
+  const inp = document.getElementById('demo-custom');
+  const text = inp.value.trim();
+  if (!text) return;
+  inp.value = '';
+  await window.demoSend(text);
+>>>>>>> 7fbb80a ( fix callback.js install.js demo.js extraction.js workspace.js dashboard.html index.html)
 };
 
 window.demoClear = function() {
-  demoExtracted = [];
-  demoRenderChips();
-  demoRenderDigest();
-  const empty = document.getElementById('demo-empty');
-  if (empty) { empty.style.display = 'block'; empty.textContent = '← Click a message to see Grix extract it.'; }
+  extracted = [];
+  renderChips(); renderDigest();
+  const e = document.getElementById('demo-empty');
+  if(e){ e.style.display='block'; e.textContent='← Click a message to see Grix extract it.'; }
 };
 
-demoRenderChips();
+renderChips();
 
+<<<<<<< HEAD
 // ── Pre-warm all sample messages on page load ─────────────────────────────
 // Fire all 8 API calls immediately so clicking chips is instant
 const demoCache = {};
@@ -740,40 +754,35 @@ window.demoCallAPI = async function(text) {
 };
 
 // ── Modals ───────────────────────────────────────────────────────────────────
+=======
+// ── Modals ────────────────────────────────────────────────────────────────────
+const FS_WAITLIST = 'https://formspree.io/f/mkoewpza';
+const FS_ANALYSIS = 'https://formspree.io/f/xojbaply';
+>>>>>>> 7fbb80a ( fix callback.js install.js demo.js extraction.js workspace.js dashboard.html index.html)
 
-const FORMSPREE_WAITLIST = 'https://formspree.io/f/mkoewpza';
-const FORMSPREE_ANALYSIS = 'https://formspree.io/f/xojbaply';
- 
-function openModal(type) {
-  if (type === 'waitlist') document.getElementById('modal-waitlist').classList.add('open');
-  else document.getElementById('modal-freeanalysis').classList.add('open');
-}
+function openModal(t) { document.getElementById('modal-'+t).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-function closeModalOutside(e, id) { if (e.target === document.getElementById(id)) closeModal(id); }
- 
+function closeModalOutside(e,id) { if(e.target===document.getElementById(id)) closeModal(id); }
+
 async function submitForm(e, type) {
   e.preventDefault();
   const form = e.target;
   const btn  = form.querySelector('button[type="submit"]');
-  const endpoint = type === 'waitlist' ? FORMSPREE_WAITLIST : FORMSPREE_ANALYSIS;
-  const formId   = type === 'waitlist' ? 'modal-waitlist' : 'modal-freeanalysis';
-  btn.textContent = 'Sending…';
-  btn.disabled = true;
+  const ep   = type==='waitlist' ? FS_WAITLIST : FS_ANALYSIS;
+  const fid  = type==='waitlist' ? 'modal-waitlist' : 'modal-freeanalysis';
+  btn.textContent = 'Sending…'; btn.disabled = true;
   try {
-    const res = await fetch(endpoint, { method: 'POST', body: new FormData(form), headers: { 'Accept': 'application/json' } });
+    const res = await fetch(ep, {method:'POST', body:new FormData(form), headers:{Accept:'application/json'}});
     if (res.ok) {
-      closeModal(formId);
-      const msg = document.getElementById('thankyou-msg');
-      msg.textContent = type === 'waitlist'
-        ? "You'll be the first to know when Grix launches. We'll reach out soon!"
-        : "We'll manually review your Slack channel and send you a custom Decision Report within 48 hours.";
-      document.getElementById('modal-thankyou').classList.add('open');
+      closeModal(fid);
+      document.getElementById('thankyou-msg').textContent = type==='waitlist'
+        ? "You'll be the first to know when Grix launches!"
+        : "We'll manually review your Slack channel and send a Decision Report within 48 hours.";
+      openModal('thankyou');
       form.reset();
-    } else {
-      alert('Something went wrong. Please try again or email hello@grix.so');
-    }
+    } else { alert('Something went wrong. Email hello@grix.so'); }
   } catch { alert('Network error. Please try again.'); }
-  btn.textContent = type === 'waitlist' ? 'Join waitlist →' : '✦ Claim free analysis →';
+  btn.textContent = type==='waitlist' ? 'Join waitlist →' : '✦ Claim free analysis →';
   btn.disabled = false;
 }
 </script>
