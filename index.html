@@ -677,6 +677,21 @@ async function submitForm(e, type) {
   btn.textContent = type==='waitlist' ? 'Join waitlist →' : '✦ Claim free analysis →';
   btn.disabled = false;
 }
+
+// Install status toast
+const installStatus = new URLSearchParams(window.location.search).get('install');
+if (installStatus === 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = '✅ Grix installed! Now invite it to a channel with /invite @Grix';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 7000);
+} else if (installStatus === 'error') {
+  const t = document.getElementById('toast');
+  t.textContent = '❌ Installation failed. Please try again.';
+  t.style.background = '#ef4444';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 5000);
+}
 </script>
 </body>
 </html>
