@@ -89,6 +89,18 @@ td{padding:13px 18px;font-size:13px;vertical-align:middle}
 .empty-state{padding:60px 24px;text-align:center}
 .empty-state p{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:10px}
 .loading-row td{padding:48px;text-align:center;font-family:var(--mono);font-size:12px;color:var(--muted)}
+
+/* Members panel */
+.members-panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:24px}
+.members-title{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+.members-grid{display:flex;flex-wrap:wrap;gap:8px}
+.member-chip{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;padding:6px 10px;transition:border-color 0.15s}
+.member-chip:hover{border-color:rgba(123,110,248,0.3)}
+.member-av{width:24px;height:24px;border-radius:6px;background:var(--purple);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0;overflow:hidden}
+.member-av img{width:100%;height:100%;object-fit:cover}
+.member-name{font-size:12px;font-weight:500}
+.member-title{font-family:var(--mono);font-size:10px;color:var(--muted)}
+
 @media(max-width:768px){th:nth-child(4),td:nth-child(4),th:nth-child(5),td:nth-child(5){display:none}}
 </style>
 </head>
@@ -137,6 +149,16 @@ td{padding:13px 18px;font-size:13px;vertical-align:middle}
       <div class="stat-card"><div class="stat-label"><span class="stat-dot" style="background:var(--green)"></span>Approvals</div><div class="stat-val c-green" id="s-approvals">—</div></div>
     </div>
 
+
+    <!-- Members -->
+    <div class="members-panel" id="members-panel" style="display:none;">
+      <div class="members-title">
+        <span>Team Members</span>
+        <span id="members-count" style="color:var(--purple)"></span>
+      </div>
+      <div class="members-grid" id="members-grid"></div>
+    </div>
+
     <div class="filter-bar">
       <button class="filter-btn active" data-type="all">All</button>
       <button class="filter-btn" data-type="decision_change">Changes</button>
@@ -155,7 +177,7 @@ td{padding:13px 18px;font-size:13px;vertical-align:middle}
     <div class="table-wrap">
       <table>
         <thead>
-          <tr><th>Type</th><th>Title</th><th>Owner</th><th>Channel</th><th>Due</th><th>Priority</th><th>Captured</th></tr>
+          <tr><th>Type</th><th>Title</th><th>Owner</th><th>Why</th><th>Channel</th><th>Due</th><th>Captured</th></tr>
         </thead>
         <tbody id="tbody">
           <tr class="loading-row"><td colspan="7">Loading workspace memory...</td></tr>
@@ -234,6 +256,7 @@ function renderRows(rows) {
       <td><span class="type-badge type-${r.type}">${r.type.replace('_',' ')}</span></td>
       <td class="td-title" title="${(r.title??'').replace(/"/g,'&quot;')}">${r.title??'—'}</td>
       <td class="td-mono">${r.owner??'—'}</td>
+      <td class="td-mono" style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${(r.reason??'').replace(/"/g,'&quot;')}">${r.reason??'—'}</td>
       <td class="td-mono">${r.source_location?'#'+r.source_location:'—'}</td>
       <td class="td-mono ${dueClass(r.due_date)}">${r.due_date?fmtDate(r.due_date):'—'}</td>
       <td><span class="prio-dot p-${r.priority??'low'}"></span></td>
@@ -283,7 +306,7 @@ document.getElementById('days-select').addEventListener('change', e => {
   currentDays = e.target.value; load();
 });
 
-if (wsId) { loadWsName(); load(); setInterval(load, 30000); }
+if (wsId) { loadWsName(); load(); loadMembers(); setInterval(load, 30000); }
 
 const installStatus = params.get('install');
 if (installStatus === 'success') alert('✅ Grix installed! Invite it to your channels to start tracking.');
