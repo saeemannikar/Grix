@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Grix – The Shadow AI for Slack</title>
+<title>Grix - Operational Memory for Slack</title>
 <script defer src="/_vercel/insights/script.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
@@ -206,11 +206,15 @@ nav {
 .cta-section { position: relative; z-index: 1; text-align: center; padding: 100px 24px 140px; }
 .cta-section h2 { font-size: clamp(28px, 4vw, 52px); font-weight: 600; letter-spacing: -2px; margin-bottom: 16px; }
 .cta-section p { font-size: 17px; color: var(--muted); margin-bottom: 36px; }
+.cta-trust { font-family: var(--mono); font-size: 11px !important; color: var(--muted); margin: 16px 0 0 !important; }
 
 /* ── Footer ── */
 footer { position: relative; z-index: 1; border-top: 1px solid var(--border); padding: 28px 24px; text-align: center; }
 footer p { font-size: 13px; color: var(--muted); }
 footer a { color: var(--purple); text-decoration: none; }
+.footer-links { display: flex; align-items: center; justify-content: center; gap: 18px; flex-wrap: wrap; margin-bottom: 10px; }
+.footer-links a { font-family: var(--mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+.footer-links a:hover { color: var(--ink); }
 
 /* ── Modals ── */
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 200; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
@@ -257,7 +261,7 @@ footer a { color: var(--purple); text-decoration: none; }
 <section class="hero">
   <div class="hero-eyebrow"><span class="eyebrow-dot"></span> First 5 teams · Free analysis</div>
   <h1>Your team's decisions,<br><em>never lost again.</em></h1>
-  <p class="hero-sub">Grix watches your Slack silently and surfaces every decision, task, and blocker the moment you open it — before you even ask.</p>
+  <p class="hero-sub">Grix turns invited Slack channels into operational memory, surfacing decisions, owners, blockers, and reversals so teams stay aligned without extra status meetings.</p>
   <div class="hero-cta">
     <a class="btn btn-primary" href="/api/slack/install">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -265,7 +269,7 @@ footer a { color: var(--purple); text-decoration: none; }
     </a>
     <button class="btn btn-ghost" onclick="openModal('freeanalysis')">✦ Get free analysis</button>
   </div>
-  <p class="hero-note">No credit card · Takes 30 seconds</p>
+  <p class="hero-note">Grix only analyzes channels it is invited to. No credit card. Takes 30 seconds.</p>
   <div class="scroll-hint">
     <div class="scroll-hint-line"></div>
     scroll
@@ -340,14 +344,14 @@ footer a { color: var(--purple); text-decoration: none; }
         </a>
         <a class="btn btn-ghost" href="/dashboard?workspace_id=demo">View dashboard →</a>
       </div>
-      <p style="font-size:11px;margin-top:10px;">Free to try · No credit card · 30 seconds</p>
+      <p style="font-size:11px;margin-top:10px;">Grix only analyzes channels it is invited to.</p>
     </div>
   </div>
 </div>
 
 <!-- STATS -->
 <div class="stats-row">
-  <div class="stat"><div class="stat-num">47</div><div class="stat-label">Slack channels analysed</div></div>
+  <div class="stat"><div class="stat-num">47</div><div class="stat-label">Invited channels analyzed</div></div>
   <div class="stat"><div class="stat-num">1.2k</div><div class="stat-label">Decisions extracted</div></div>
   <div class="stat"><div class="stat-num">5</div><div class="stat-label">Free spots left</div></div>
 </div>
@@ -361,8 +365,8 @@ footer a { color: var(--purple); text-decoration: none; }
   <div class="section-sub">No dashboards to check. No commands to remember. Grix tells you before you ask.</div>
   <div class="how-grid">
     <div class="how-card"><div class="how-num">1</div><h3>Install in 30 seconds</h3><p>Click "Add to Slack" and invite Grix to your channels. No setup, no config.</p></div>
-    <div class="how-card"><div class="how-num">2</div><h3>Grix watches silently</h3><p>Every message in every channel is read, understood, and categorized in real time.</p></div>
-    <div class="how-card"><div class="how-num">3</div><h3>You open Slack</h3><p>Grix greets you with everything that happened since you were last active. Before you type anything.</p></div>
+    <div class="how-card"><div class="how-num">2</div><h3>Invited-channel memory</h3><p>When your team invites Grix to a channel, it organizes decisions, tasks, blockers, and reversals into shared context.</p></div>
+    <div class="how-card"><div class="how-num">3</div><h3>You open Slack</h3><p>Grix gives you the operational context your team already agreed on. Before you type anything.</p></div>
     <div class="how-card" style="border-color:rgba(123,110,248,0.3)"><div class="how-num">4</div><h3>Changed decisions flagged</h3><p>If something was decided then reversed, Grix catches it and tells you exactly what changed to what.</p></div>
   </div>
 </div>
@@ -374,10 +378,16 @@ footer a { color: var(--purple); text-decoration: none; }
   <h2>Stop losing decisions in Slack.</h2>
   <p>First 5 teams get a free manual Decision Report. No setup, no code.</p>
   <button class="btn btn-primary" style="font-size:16px;padding:15px 36px;" onclick="openModal('freeanalysis')">✦ Claim your free analysis</button>
+  <p class="cta-trust">Grix only analyzes channels it is invited to.</p>
 </div>
 
 <!-- FOOTER -->
 <footer>
+  <div class="footer-links">
+    <a href="/privacy">Privacy</a>
+    <a href="/terms">Terms</a>
+    <a href="/security">Security</a>
+  </div>
   <p>© 2026 Grix · Built in public · <a href="mailto:hello@grix.so">hello@grix.so</a></p>
 </footer>
 
