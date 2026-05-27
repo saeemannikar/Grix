@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Security - Grix</title>
+<script defer src="/_vercel/insights/script.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="/legal.css"/>
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="/">
+    <div class="nav-logo-icon">
+      <svg viewBox="0 0 17 17" fill="none"><path d="M3 4h11M3 8.5h7M3 13h9" stroke="white" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </div>
+    Grix
+  </a>
+  <div class="nav-right">
+    <a class="nav-link" href="/privacy">Privacy</a>
+    <a class="nav-link" href="/terms">Terms</a>
+    <a class="nav-link active" href="/security">Security</a>
+    <a class="btn" href="/api/slack/install">Add to Slack</a>
+  </div>
+</nav>
+
+<main class="legal-main">
+  <section class="legal-hero">
+    <div>
+      <div class="legal-eyebrow">Security</div>
+      <h1>Calm security. Clear boundaries.</h1>
+      <p class="legal-intro">Grix is built to preserve operational memory from invited Slack channels while keeping customer workspace data separate, controlled, and used only for the product experience.</p>
+    </div>
+    <aside class="trust-panel">
+      <span>Core promise</span>
+      <strong>Grix only analyzes channels it is invited to.</strong>
+      <p>Security starts with scope. Your team decides where Grix belongs and what context it can help organize.</p>
+    </aside>
+  </section>
+
+  <section class="legal-layout">
+    <aside class="legal-toc" aria-label="Security sections">
+      <span>On this page</span>
+      <a href="#https">HTTPS encryption</a>
+      <a href="#isolation">Workspace isolation</a>
+      <a href="#access">Access control</a>
+      <a href="#processing">Operational memory</a>
+      <a href="#ownership">Customer ownership</a>
+      <a href="#reporting">Report an issue</a>
+    </aside>
+
+    <div class="legal-content">
+      <article class="legal-card" id="https">
+        <h2>HTTPS encryption</h2>
+        <p>Communication with Grix is encrypted over HTTPS. This helps protect data in transit between your browser, Slack-connected flows, and Grix endpoints.</p>
+      </article>
+
+      <article class="legal-card" id="isolation">
+        <h2>Workspace isolation</h2>
+        <p>Workspace data is isolated so one customer's workspace content is not exposed to another customer's workspace. Grix treats each workspace as its own trust boundary.</p>
+      </article>
+
+      <article class="legal-card" id="access">
+        <h2>Access control</h2>
+        <p>Grix should be installed and managed by authorized workspace owners, administrators, or approved operators. Customers control which channels Grix is invited to and who is allowed to view workspace outputs.</p>
+        <p>We recommend inviting Grix only to channels where operational memory is useful and appropriate for your team.</p>
+      </article>
+
+      <article class="legal-card" id="processing">
+        <h2>Operational memory processing</h2>
+        <p>Grix processes invited-channel conversations to identify team decisions, tasks, blockers, approvals, reversals, and summaries. The goal is organizational clarity, not individual performance scoring.</p>
+        <p>Grix does not use customer data to train public AI models and does not sell customer data.</p>
+      </article>
+
+      <article class="legal-card" id="ownership">
+        <h2>Customer ownership</h2>
+        <p>Your workspace data remains your workspace data. Grix uses it to provide operational memory to your team, subject to the permissions and controls you choose for your workspace.</p>
+        <p>Workspace owners can request deletion of workspace data at any time.</p>
+      </article>
+
+      <article class="legal-card" id="reporting">
+        <h2>Report an issue</h2>
+        <p>If you believe you found a security issue or have a security question, contact <a href="mailto:hello@grix.so">hello@grix.so</a>. Please include enough detail for us to understand and reproduce the issue.</p>
+        <p>Last updated: May 27, 2026.</p>
+      </article>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="footer-links">
+    <a href="/privacy">Privacy</a>
+    <a href="/terms">Terms</a>
+    <a href="/security">Security</a>
+  </div>
+  <p>(c) 2026 Grix - Built in public - <a href="mailto:hello@grix.so">hello@grix.so</a></p>
+</footer>
+</body>
+</html>
