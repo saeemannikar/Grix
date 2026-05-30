@@ -3,6 +3,14 @@
     { "source": "/dashboard", "destination": "/dashboard.html" },
     { "source": "/privacy", "destination": "/privacy.html" },
     { "source": "/terms", "destination": "/terms.html" },
-    { "source": "/security", "destination": "/security.html" }
+    { "source": "/security", "destination": "/security.html" },
+    {
+      "source": "/api/slack/:path*",
+      "destination": "http://grix-production.eba-pukvvzte.us-west-1.elasticbeanstalk.com/api/slack/:path*"
+    },
+    {
+      "source": "/api/auth/:path*",
+      "destination": "http://grix-production.eba-pukvvzte.us-west-1.elasticbeanstalk.com/api/auth/:path*"
+    }
   ]
 }
